@@ -1,0 +1,40 @@
+name: lazycampus-platform-test
+services:
+  redis:
+    image: redis:7.4-alpine
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      retries: 30
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: platform-test-only
+      MYSQL_DATABASE: platform_test
+    tmpfs: /var/lib/mysql
+    healthcheck:
+      test: [CMD, mysqladmin, ping, --silent]
+      interval: 3s
+      retries: 40
+  test:
+    image: golang:1.25.1-bookworm
+    working_dir: /app
+    # Avoid traversing host frontend dependencies during Go package discovery.
+    tmpfs: /app/web/node_modules
+    volumes:
+      - .:/app
+      - go-cache:/go
+      - build-cache:/root/.cache/go-build
+    environment:
+      PLATFORM_TEST_REDIS_URL: redis://redis:6379/0
+      PLATFORM_TEST_MYSQL_DSN: root:platform-test-only@tcp(mysql:3306)/platform_test?charset=utf8mb4&parseTime=True&loc=UTC
+    command: [sh, -c, 'gofmt -w campus common main.go && go mod tidy && go test -race -count=1 ./... && go vet ./...']
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+volumes:
+  go-cache:
+    name: lazycampus-platform-go
+  build-cache:

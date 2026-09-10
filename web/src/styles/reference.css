@@ -1,0 +1,604 @@
+.reference-v2 {
+  grid-template-columns: 248px minmax(0, 1fr);
+  overflow: visible;
+  align-items: start;
+}
+.reference-v2 .api-list {
+  position: sticky;
+  top: 88px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 108px);
+  min-width: 0;
+  padding: 20px 12px 12px;
+}
+.reference-v2 .search-field {
+  padding: 0 6px 16px;
+  flex: none;
+}
+.reference-v2 .search-field input {
+  font-size: 12px;
+  min-width: 0;
+}
+.reference-clear {
+  font-size: 11px;
+  white-space: nowrap;
+}
+.reference-v2 .api-list-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.reference-nav-title {
+  color: var(--muted-foreground);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  padding: 19px 12px 8px;
+}
+.reference-nav-title:first-child {
+  padding-top: 4px;
+}
+.reference-v2 .api-item {
+  text-decoration: none;
+  padding: 10px 12px;
+  margin-bottom: 2px;
+}
+.reference-v2 .api-item > span {
+  font-size: 13px;
+  font-weight: 500;
+}
+.reference-v2 .api-item code {
+  font-size: 10px;
+  white-space: nowrap;
+}
+.dark .reference-v2 {
+  color-scheme: dark;
+}
+.reference-v2 .reference-guide-item > span {
+  margin: 0;
+}
+.reference-nav-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 12px;
+}
+.reference-status-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 12px 2px;
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  flex: none;
+  color: var(--muted-foreground);
+}
+.reference-empty {
+  padding: 15px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+}
+.reference-v2 .api-document {
+  padding: clamp(24px, 3.2vw, 48px);
+  min-width: 0;
+  max-width: 1024px;
+  width: 100%;
+  margin: 0 auto;
+}
+.reference-v2 .api-document > h2 {
+  font-size: clamp(24px, 2.1vw, 32px);
+  letter-spacing: -0.035em;
+  line-height: 1.4;
+  margin: 0 0 15px;
+  font-weight: 650;
+}
+.reference-v2 .api-document > h3 {
+  font-size: 17px;
+  margin: 36px 0 15px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.reference-v2 .api-document > p {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted-foreground);
+  margin: 13px 0;
+  overflow-wrap: anywhere;
+}
+.reference-v2 .api-document > .reference-lead {
+  font-size: 15px;
+  line-height: 1.85;
+  margin-bottom: 26px;
+  max-width: 66ch;
+}
+.reference-v2 .api-document > .reference-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  margin: 0 0 14px;
+  color: var(--primary);
+}
+.reference-v2 .api-document p a,
+.reference-steps a {
+  color: var(--primary);
+  text-underline-offset: 4px;
+  text-decoration: underline;
+}
+.reference-v2 .api-document p a svg {
+  display: inline;
+  vertical-align: middle;
+}
+.reference-v2 .api-document p code,
+.reference-notes code {
+  color: var(--foreground);
+  font-size: 0.94em;
+}
+.reference-base {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 17px 20px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--background);
+  flex-wrap: wrap;
+}
+.reference-base > span {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  letter-spacing: 0.08em;
+}
+.reference-base code {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.reference-quicksteps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 30px 0;
+}
+.reference-quicksteps > div {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 13px;
+  padding: 5px 0;
+  min-width: 0;
+}
+.reference-quicksteps svg {
+  color: var(--primary);
+}
+.reference-quicksteps strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.reference-quicksteps p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+  flex: 1;
+}
+.reference-quicksteps a {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  color: var(--primary);
+  font-size: 12px;
+}
+.reference-v2 .code-example {
+  margin-top: 16px;
+  overflow: hidden;
+  min-width: 0;
+}
+.reference-v2 .code-example > div {
+  font-size: 12px;
+  gap: 8px;
+}
+.reference-v2 .syntax-code {
+  font-size: 12px;
+  line-height: 1.9;
+  max-width: 100%;
+  overflow: auto;
+  border-radius: 8px;
+  padding: 20px;
+}
+.reference-v2 .reference-response-example pre {
+  max-height: 420px;
+  scrollbar-width: thin;
+}
+.reference-v2 .reference-code-tabs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.reference-code-tabs button {
+  padding: 5px 8px;
+  font-size: 11px;
+  border-radius: 5px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+.reference-code-tabs button[aria-pressed='true'] {
+  color: var(--foreground);
+  background: var(--secondary);
+}
+.reference-v2 .syntax-comment {
+  color: #8190a9;
+}
+.reference-workflows {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+}
+.reference-workflows a {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.reference-workflows a:last-child {
+  border: 0;
+}
+.reference-workflows strong {
+  font-weight: 600;
+}
+.reference-workflows span {
+  color: var(--muted-foreground);
+  line-height: 1.7;
+}
+.reference-v2 .api-document > .reference-callout {
+  background: var(--secondary);
+  border-left: 3px solid var(--primary);
+  padding: 16px 19px;
+  border-radius: 0 7px 7px 0;
+  margin: 24px 0;
+}
+.reference-steps,
+.reference-notes {
+  padding-left: 21px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted-foreground);
+}
+.reference-steps {
+  list-style: decimal;
+}
+.reference-notes {
+  list-style: disc;
+}
+.reference-notes li,
+.reference-steps li {
+  padding-left: 3px;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+.reference-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  margin: 16px 0;
+}
+.reference-table-wrap table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+  text-align: left;
+}
+.reference-table-wrap th {
+  background: var(--background);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  padding: 12px 15px;
+  white-space: nowrap;
+}
+.reference-table-wrap td {
+  padding: 15px;
+  border-top: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.85;
+  min-width: 70px;
+}
+.reference-table-wrap td:last-child {
+  min-width: 220px;
+}
+.reference-table-wrap td code {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.reference-table-wrap td:first-child {
+  max-width: 220px;
+}
+.reference-table-wrap td:first-child code {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.reference-required,
+.reference-optional {
+  display: block;
+  font-size: 10px;
+  margin-top: 4px;
+}
+.reference-required {
+  color: var(--primary);
+  font-weight: 600;
+}
+.reference-optional,
+.reference-parameter-detail {
+  color: var(--muted-foreground);
+}
+.reference-parameter-detail {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+}
+.reference-facts,
+.reference-endpoint-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 19px 0;
+  border-bottom: 1px solid var(--border);
+}
+.reference-facts > div,
+.reference-endpoint-meta > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.reference-facts span,
+.reference-endpoint-meta > div > span {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.reference-facts strong {
+  font-size: 17px;
+  font-weight: 600;
+}
+.reference-endpoint-meta code,
+.reference-endpoint-meta strong {
+  font-size: 12px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.reference-v2 .endpoint-heading {
+  margin: 0;
+  background: var(--background);
+  border: 1px solid var(--border);
+  padding: 13px 15px;
+  border-radius: 8px;
+}
+.reference-v2 .endpoint-heading > code {
+  font-size: 13px;
+}
+.reference-v2 .api-document > .reference-limit-caption {
+  font-size: 11px;
+}
+.reference-operator-note {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin: 18px 0;
+}
+.reference-operator-note p {
+  padding-top: 10px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+}
+.reference-fields {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+.reference-field {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.reference-field:last-child {
+  border-bottom: 0;
+}
+.reference-field > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.reference-field-name {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.reference-field-type {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  font-family: monospace;
+}
+.reference-field p {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 9px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.reference-field summary {
+  font-size: 11px;
+  color: var(--primary);
+  padding-top: 10px;
+  cursor: pointer;
+}
+.reference-field .reference-fields {
+  margin: 12px 0 0;
+  background: var(--background);
+}
+.reference-field .reference-field {
+  padding: 13px;
+}
+.reference-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.reference-related a {
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: 12px;
+}
+.reference-v2 .response-block > div {
+  flex-wrap: wrap;
+}
+.reference-request-id {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+.reference-request-id code {
+  overflow-wrap: anywhere;
+}
+.reference-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 26px;
+  margin-top: 40px;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+.reference-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+.reference-v2 a:focus-visible,
+.reference-v2 button:focus-visible,
+.reference-v2 summary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .reference-workflows a:hover,
+  .reference-related a:hover {
+    background: var(--background);
+  }
+  .reference-code-tabs button:hover {
+    color: var(--foreground);
+  }
+}
+@media (max-width: 1150px) {
+  .reference-v2 {
+    grid-template-columns: 210px minmax(0, 1fr);
+  }
+  .reference-v2 .api-document {
+    padding: 28px;
+  }
+  .reference-quicksteps {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .reference-quicksteps > div {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 7px 12px;
+  }
+  .reference-quicksteps p,
+  .reference-quicksteps a {
+    grid-column: 2;
+  }
+}
+@media (max-width: 900px) {
+  .reference-v2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .reference-v2 .api-list {
+    position: static;
+    max-height: 280px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+  }
+  .reference-v2 .api-list-scroll {
+    display: block;
+    max-height: none;
+  }
+  .reference-v2 .api-item {
+    min-width: 0;
+  }
+  .reference-v2 .api-list-scroll > div:not(.reference-nav-divider) {
+    margin-top: 10px;
+  }
+  .reference-v2 .api-document {
+    padding: 24px;
+  }
+  .reference-facts {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+@media (max-width: 480px) {
+  .reference-v2 .api-document {
+    padding: 23px 17px;
+  }
+  .reference-v2 .api-document > h2 {
+    font-size: 24px;
+  }
+  .reference-v2 .endpoint-heading {
+    gap: 6px;
+    padding: 11px 9px;
+  }
+  .reference-v2 .endpoint-heading > code {
+    font-size: 11px;
+  }
+  .reference-endpoint-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+  .reference-workflows a {
+    grid-template-columns: minmax(0, 1fr) 16px;
+  }
+  .reference-workflows span {
+    grid-column: 1;
+  }
+  .reference-workflows svg {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+  .reference-v2 .syntax-code {
+    padding: 15px;
+    font-size: 11px;
+  }
+  .reference-field {
+    padding: 14px 11px;
+  }
+  .reference-field .reference-field {
+    padding: 12px 8px;
+  }
+  .reference-code-tabs button {
+    padding: 5px;
+    font-size: 10px;
+  }
+  .reference-base {
+    padding: 15px;
+    gap: 8px;
+  }
+  .reference-base code {
+    font-size: 11px;
+  }
+}

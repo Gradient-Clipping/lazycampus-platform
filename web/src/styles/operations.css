@@ -1,0 +1,556 @@
+.ops-stack {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.ops-stack fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.ops-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.ops-field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+}
+.ops-field-control {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+}
+.ops-field-control > span {
+  font-weight: 550;
+}
+.ops-field small,
+.ops-footnote,
+.ops-block {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.ops-field select,
+.ops-filters select,
+.list-toolbar > select {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  border: 1px solid var(--input);
+  background: var(--card);
+  color: var(--foreground);
+  padding: 7px 10px;
+  border-radius: 8px;
+}
+.list-toolbar > select {
+  width: auto;
+  max-width: 220px;
+}
+.ops-field input,
+.ops-field textarea {
+  min-width: 0;
+  width: 100%;
+}
+.ops-field-wide {
+  grid-column: 1 / -1;
+}
+.ops-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.ops-filters {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 22px;
+  display: grid;
+  gap: 16px;
+  background: var(--card);
+}
+.ops-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+}
+.ops-advanced-filters > summary {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  cursor: pointer;
+  width: fit-content;
+}
+.ops-advanced-filters[open] > summary {
+  margin-bottom: 16px;
+}
+.ops-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.ops-metric {
+  padding: 20px;
+  gap: 10px;
+}
+.ops-metric > span {
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+.ops-metric strong {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.7px;
+  font-variant-numeric: tabular-nums;
+}
+.ops-metric small {
+  color: var(--muted-foreground);
+}
+.ops-card-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+.table-card > .ops-card-heading {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.ops-card-heading h2 {
+  line-height: 1.6;
+}
+.ops-card-heading p {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin-top: 3px;
+}
+.ops-chart {
+  padding: 20px 20px 12px;
+  gap: 16px;
+}
+.ops-chart-plot {
+  width: 100%;
+  min-width: 0;
+}
+.ops-chart svg {
+  display: block;
+  width: 100%;
+  min-height: 200px;
+  overflow: visible;
+}
+.ops-chart svg text {
+  fill: var(--muted-foreground);
+  font-size: 11px;
+  font-family: inherit;
+}
+.ops-chart-point {
+  fill: var(--chart-1, #3483bc);
+  stroke: var(--card);
+  stroke-width: 2;
+  cursor: crosshair;
+}
+.ops-chart-point:focus-visible {
+  outline: none;
+  stroke: var(--foreground);
+  stroke-width: 3;
+}
+.ops-chart-reading {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.ops-text-button,
+.ops-text-link {
+  color: var(--primary);
+  font-weight: 500;
+  text-align: left;
+}
+.ops-text-button:hover,
+.ops-text-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.ops-footnote {
+  padding: 14px 20px;
+}
+.ops-detail {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+.ops-detail > div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+}
+.ops-detail dt {
+  color: var(--muted-foreground);
+}
+.ops-detail dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.ops-id-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.ops-id-row code {
+  overflow-wrap: anywhere;
+  flex: 1;
+  min-width: 0;
+}
+.ops-endpoints {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.ops-endpoint {
+  padding: 20px;
+  gap: 13px;
+}
+.ops-endpoint > p {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+.ops-endpoint > code {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.ops-endpoint-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: auto;
+  font-size: 13px;
+}
+.ops-endpoint-footer small {
+  color: var(--muted-foreground);
+  line-height: 2;
+}
+.ops-settings-card {
+  padding: 26px;
+  max-width: 960px;
+}
+.ops-tab-row {
+  margin-bottom: 24px;
+  width: fit-content;
+}
+.ops-faq-edit {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: grid;
+  gap: 12px;
+}
+.ops-warning {
+  padding: 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, #dc8d12 10%, transparent);
+  color: var(--foreground);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+.ops-block {
+  display: block;
+}
+.ops-app-reason {
+  padding: 0 20px 18px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.ops-notification-bell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
+  flex: none;
+  border-radius: 8px;
+}
+.ops-notification-bell:hover {
+  background: var(--muted);
+}
+.ops-notification-bell > span {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  background: #d44545;
+  color: #fff;
+  font-size: 10px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 9px;
+  text-align: center;
+  line-height: 16px;
+}
+.ops-notification {
+  padding: 22px;
+  gap: 12px;
+}
+.ops-notification.is-unread {
+  border-left: 3px solid var(--primary);
+}
+.ops-notification > p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.9;
+}
+.ops-notification-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted-foreground);
+}
+.ops-notification-preferences {
+  padding: 24px 4px 8px;
+}
+.ops-code-verification {
+  display: flex;
+  gap: 10px;
+}
+.ops-alert-preference {
+  display: grid;
+  gap: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+.ops-device {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+}
+.ops-device-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: var(--muted);
+  border-radius: 14px;
+  flex: none;
+}
+.ops-device-info {
+  flex: 1;
+  min-width: 0;
+}
+.ops-device-info > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ops-device-info p {
+  margin: 8px 0;
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+.ops-device-info small {
+  line-height: 1.7;
+  color: var(--muted-foreground);
+}
+.ops-help-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 26px;
+}
+.ops-help-status a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.ops-help-status a > span:last-child {
+  color: var(--muted-foreground);
+}
+.ops-status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4fa972;
+  flex: none;
+}
+.ops-status-dot.maintenance,
+.ops-status-dot.degraded {
+  background: #d29a3e;
+}
+.ops-status-dot.disabled {
+  background: #dc6868;
+}
+.ops-service-message {
+  margin: 18px 0;
+  white-space: pre-wrap;
+}
+.ops-faq-list {
+  display: grid;
+  margin-top: 26px;
+}
+.ops-faq-list details {
+  border-bottom: 1px solid var(--border);
+  padding: 18px 0;
+}
+.ops-faq-list summary {
+  font-size: 15px;
+  cursor: pointer;
+}
+.ops-faq-list p {
+  margin-top: 14px;
+  line-height: 1.9;
+  color: var(--muted-foreground);
+  white-space: pre-wrap;
+}
+.ops-status-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 140px 20px 50px;
+  display: grid;
+  gap: 28px;
+}
+.ops-status-page h1 {
+  font-size: 36px;
+}
+.ops-status-overall {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 24px;
+}
+.ops-status-overall p {
+  flex-basis: 100%;
+  color: var(--muted-foreground);
+  white-space: pre-wrap;
+}
+.ops-reference-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 20px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.ops-audit-details {
+  max-height: 60vh;
+  overflow: auto;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.platform-sidebar > nav,
+.platform-sidebar > .nav-caption,
+.platform-sidebar > .sidebar-bottom {
+  flex-shrink: 0;
+}
+@media (min-width: 1300px) {
+  .ops-metrics {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+@media (max-width: 750px) {
+  .ops-endpoints {
+    grid-template-columns: 1fr;
+  }
+  .ops-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .ops-metric {
+    padding: 16px;
+  }
+  .ops-metric strong {
+    font-size: 25px;
+  }
+  .ops-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .ops-settings-card {
+    padding: 18px;
+  }
+  .ops-card-heading .segmented-tabs {
+    max-width: 100%;
+  }
+  .ops-card-heading .segmented-tabs button {
+    padding: 7px 10px;
+  }
+  .ops-chart {
+    padding: 16px 10px;
+  }
+  .ops-chart svg {
+    min-height: 170px;
+  }
+  .ops-device {
+    padding: 18px;
+    gap: 12px;
+  }
+  .ops-device-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+  .ops-device-info h2 {
+    font-size: 14px;
+  }
+  .site-header-right {
+    gap: 3px;
+  }
+}
+@media (max-width: 430px) {
+  .ops-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .ops-filter-grid {
+    grid-template-columns: 1fr;
+  }
+  .ops-device {
+    flex-wrap: wrap;
+  }
+  .ops-device > button {
+    margin-left: auto;
+  }
+  .ops-detail > div {
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 10px;
+  }
+  .profile-settings .segmented-tabs button {
+    gap: 5px;
+    font-size: 12px;
+    padding: 8px;
+  }
+  .profile-settings .segmented-tabs button svg {
+    display: none;
+  }
+}

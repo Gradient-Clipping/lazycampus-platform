@@ -1,0 +1,3858 @@
+{
+  "schemas": {
+    "Pagination": {
+      "type": "object",
+      "description": "分页信息；无记录时 total 和 totalPages 为 0",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "description": "当前页，从 1 开始"
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "本页容量"
+        },
+        "total": {
+          "type": "integer",
+          "description": "符合条件的记录总数"
+        },
+        "totalPages": {
+          "type": "integer",
+          "description": "总页数"
+        }
+      }
+    },
+    "Meta": {
+      "type": "object",
+      "description": "数据版本与可用状态；不同接口按需返回",
+      "properties": {
+        "cached": {
+          "type": "boolean",
+          "description": "是否读取已有数据"
+        },
+        "fetchedAt": {
+          "type": "string",
+          "description": "数据版本时间；以此比较新旧",
+          "format": "date-time"
+        },
+        "refreshing": {
+          "type": "boolean",
+          "description": "是否正在后台更新"
+        },
+        "stale": {
+          "type": "boolean",
+          "description": "本次更新失败，返回已有数据"
+        },
+        "deleted": {
+          "type": "boolean",
+          "description": "数据已删除；以此空结果覆盖较旧的本地数据"
+        },
+        "shared": {
+          "type": "boolean",
+          "description": "是否复用寝室共享账单"
+        }
+      }
+    },
+    "Semester": {
+      "type": "object",
+      "description": "学期选项；直接使用返回的 id",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "学期标识，例如 2026-1"
+        },
+        "academicYear": {
+          "type": "integer",
+          "description": "学年起始年份"
+        },
+        "academicYearLabel": {
+          "type": "string",
+          "description": "完整学年，例如 2026-2027"
+        },
+        "term": {
+          "type": "integer",
+          "description": "1、2 或 3"
+        },
+        "label": {
+          "type": "string",
+          "description": "学期显示名称"
+        }
+      }
+    },
+    "SelectOption": {
+      "type": "object",
+      "description": "选项",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "用于查询的编码"
+        },
+        "label": {
+          "type": "string",
+          "description": "显示名称"
+        }
+      }
+    },
+    "Period": {
+      "type": "object",
+      "description": "学校当地时间的节次",
+      "properties": {
+        "period": {
+          "type": "integer",
+          "description": "节次编号"
+        },
+        "startTime": {
+          "type": "string",
+          "description": "开始时间，HH:mm"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "结束时间，HH:mm"
+        }
+      }
+    },
+    "GradeValue": {
+      "description": "数字成绩、等级或文字状态；没有成绩为 null。不要强制转换为数值。",
+      "anyOf": [
+        {
+          "type": "number",
+          "nullable": true
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "Grade": {
+      "type": "object",
+      "description": "本人的一条成绩记录",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "课程记录标识；查询班级分布时与学年、学期一起使用"
+        },
+        "academicYear": {
+          "type": "string",
+          "description": "学年名称，例如 2025-2026"
+        },
+        "term": {
+          "type": "integer",
+          "description": "学期，1、2 或 3",
+          "nullable": true
+        },
+        "courseCode": {
+          "type": "string",
+          "description": "课程号"
+        },
+        "courseName": {
+          "type": "string",
+          "description": "课程名称"
+        },
+        "teachingClass": {
+          "type": "string",
+          "description": "教学班名称"
+        },
+        "teacherName": {
+          "type": "string",
+          "description": "教师姓名"
+        },
+        "department": {
+          "type": "string",
+          "description": "开课学院"
+        },
+        "courseNatureCode": {
+          "type": "string",
+          "description": "课程性质编码",
+          "nullable": true
+        },
+        "courseNature": {
+          "type": "string",
+          "description": "课程性质",
+          "nullable": true
+        },
+        "gradeNatureCode": {
+          "type": "string",
+          "description": "成绩性质编码",
+          "nullable": true
+        },
+        "gradeNature": {
+          "type": "string",
+          "description": "正常考试、补考、缓考等成绩性质",
+          "nullable": true
+        },
+        "credits": {
+          "type": "number",
+          "description": "学分",
+          "nullable": true
+        },
+        "finalScore": {
+          "$ref": "#/components/schemas/GradeValue"
+        },
+        "calculationScore": {
+          "type": "number",
+          "description": "用于统计的换算分数；文字状态可能无法换算",
+          "nullable": true
+        },
+        "gradePoint": {
+          "type": "number",
+          "description": "绩点",
+          "nullable": true
+        },
+        "countsTowardGradePointAverage": {
+          "type": "boolean",
+          "description": "绩点计算兼容标记"
+        },
+        "gradeRemark": {
+          "type": "string",
+          "description": "额外成绩备注",
+          "nullable": true
+        },
+        "components": {
+          "type": "array",
+          "description": "成绩分项；补考或缓考可能为空",
+          "items": {
+            "type": "object",
+            "description": "分项",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "名称"
+              },
+              "weightPercent": {
+                "type": "number",
+                "description": "权重，百分比",
+                "nullable": true
+              },
+              "score": {
+                "$ref": "#/components/schemas/GradeValue"
+              }
+            }
+          }
+        }
+      }
+    },
+    "MessageSchedule": {
+      "type": "object",
+      "description": "课程变更安排",
+      "properties": {
+        "weekStart": {
+          "type": "integer",
+          "description": "最早周次"
+        },
+        "weekEnd": {
+          "type": "integer",
+          "description": "最晚周次"
+        },
+        "weeks": {
+          "type": "array",
+          "description": "实际周次，支持离散与单双周",
+          "items": {
+            "type": "integer",
+            "description": "周次"
+          }
+        },
+        "weekday": {
+          "type": "integer",
+          "description": "星期一为 1，星期日为 7"
+        },
+        "periodStart": {
+          "type": "integer",
+          "description": "开始节次"
+        },
+        "periodEnd": {
+          "type": "integer",
+          "description": "结束节次"
+        },
+        "location": {
+          "type": "string",
+          "description": "地点",
+          "nullable": true
+        }
+      }
+    },
+    "NoticeSegment": {
+      "type": "object",
+      "description": "按 type 选择对应字段",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "段落内稳定标识"
+        },
+        "type": {
+          "type": "string",
+          "description": "html、image 或 attachment"
+        },
+        "contentHtml": {
+          "type": "string",
+          "description": "html 类型的正文"
+        },
+        "src": {
+          "type": "string",
+          "description": "image 类型的图片链接"
+        },
+        "alt": {
+          "type": "string",
+          "description": "image 类型的替代文本"
+        },
+        "url": {
+          "type": "string",
+          "description": "attachment 类型的附件原始 URL，传给附件接口"
+        },
+        "name": {
+          "type": "string",
+          "description": "attachment 类型的文件名"
+        },
+        "fileType": {
+          "type": "string",
+          "description": "附件文件类型"
+        },
+        "iconSrc": {
+          "type": "string",
+          "description": "附件图标链接"
+        }
+      }
+    },
+    "NoticeBlock": {
+      "type": "object",
+      "description": "正文块",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "块标识"
+        },
+        "type": {
+          "type": "string",
+          "description": "html 或 list"
+        },
+        "contentHtml": {
+          "type": "string",
+          "description": "html 类型的安全正文"
+        },
+        "segments": {
+          "type": "array",
+          "description": "html 类型的有序内容片段",
+          "items": {
+            "$ref": "#/components/schemas/NoticeSegment"
+          }
+        },
+        "markerWidthEm": {
+          "type": "number",
+          "description": "list 类型的编号占位宽度，em"
+        },
+        "items": {
+          "type": "array",
+          "description": "list 类型的列表项",
+          "items": {
+            "type": "object",
+            "description": "列表项",
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "项标识"
+              },
+              "marker": {
+                "type": "string",
+                "description": "编号或项目符号"
+              },
+              "contentHtml": {
+                "type": "string",
+                "description": "正文"
+              },
+              "segments": {
+                "type": "array",
+                "description": "有序内容片段",
+                "items": {
+                  "$ref": "#/components/schemas/NoticeSegment"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Publication": {
+      "type": "object",
+      "description": "对本人可见的校园应用公告或通知",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "内容标识"
+        },
+        "kind": {
+          "type": "string",
+          "description": "announcement 或 notification"
+        },
+        "title": {
+          "type": "string",
+          "description": "标题"
+        },
+        "contentMarkdown": {
+          "type": "string",
+          "description": "Markdown 正文"
+        },
+        "iconTone": {
+          "type": "string",
+          "description": "default、warning、success 或 info"
+        },
+        "accentColor": {
+          "type": "string",
+          "description": "强调色"
+        },
+        "visibilityMode": {
+          "type": "string",
+          "description": "permanent 或 timed"
+        },
+        "reminderMode": {
+          "type": "string",
+          "description": "once、always 或 inbox"
+        },
+        "startsAt": {
+          "type": "string",
+          "description": "生效时间",
+          "format": "date-time"
+        },
+        "expiresAt": {
+          "type": "string",
+          "description": "结束时间",
+          "format": "date-time",
+          "nullable": true
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "发布时间",
+          "format": "date-time"
+        },
+        "isRead": {
+          "type": "boolean",
+          "description": "小程序中的已读状态"
+        },
+        "readAt": {
+          "type": "string",
+          "description": "已读时间",
+          "format": "date-time",
+          "nullable": true
+        },
+        "shouldPopup": {
+          "type": "boolean",
+          "description": "小程序弹窗状态"
+        },
+        "media": {
+          "type": "array",
+          "description": "媒体元信息；本开放版本未提供对应媒体下载接口",
+          "items": {
+            "type": "object",
+            "description": "媒体",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "媒体标识"
+              },
+              "publicationId": {
+                "type": "string",
+                "description": "所属内容标识"
+              },
+              "originalName": {
+                "type": "string",
+                "description": "原文件名"
+              },
+              "contentType": {
+                "type": "string",
+                "description": "MIME 类型"
+              },
+              "sizeBytes": {
+                "type": "integer",
+                "description": "字节数"
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "上传时间",
+                "format": "date-time"
+              },
+              "url": {
+                "type": "string",
+                "description": "校园应用内部媒体链接，不能使用开放平台密钥访问"
+              }
+            }
+          }
+        }
+      }
+    },
+    "CalendarData": {
+      "type": "object",
+      "description": "校历元数据",
+      "properties": {
+        "academicYear": {
+          "type": "string",
+          "description": "学年名称"
+        },
+        "startYear": {
+          "type": "integer",
+          "description": "学年起始年份"
+        },
+        "availableAcademicYears": {
+          "type": "array",
+          "description": "可查询学年",
+          "items": {
+            "type": "integer",
+            "description": "起始年份"
+          }
+        },
+        "availableCalendars": {
+          "type": "array",
+          "description": "完整学年选项",
+          "items": {
+            "type": "object",
+            "description": "学年",
+            "properties": {
+              "startYear": {
+                "type": "integer",
+                "description": "起始年份"
+              },
+              "academicYear": {
+                "type": "string",
+                "description": "名称"
+              }
+            }
+          }
+        },
+        "publishedAt": {
+          "type": "string",
+          "description": "学校发布日期",
+          "nullable": true
+        },
+        "sourcePageUrl": {
+          "type": "string",
+          "description": "学校来源页面"
+        },
+        "contentType": {
+          "type": "string",
+          "description": "图片 MIME 类型"
+        },
+        "size": {
+          "type": "integer",
+          "description": "原图大小，字节"
+        },
+        "version": {
+          "type": "string",
+          "description": "图片版本，不透明标识"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "开放平台相对路径；下载时仍携带应用密钥"
+        }
+      }
+    },
+    "GradesData": {
+      "type": "object",
+      "description": "成绩单",
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "当前页记录",
+          "items": {
+            "$ref": "#/components/schemas/Grade"
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/Pagination"
+        },
+        "summary": {
+          "type": "object",
+          "description": "对全部筛选结果汇总，不局限于当前页",
+          "properties": {
+            "courseCount": {
+              "type": "integer",
+              "description": "课程数"
+            },
+            "totalCredits": {
+              "type": "number",
+              "description": "总学分"
+            },
+            "weightedAverage": {
+              "type": "number",
+              "description": "加权平均分",
+              "nullable": true
+            },
+            "gradePointAverage": {
+              "type": "number",
+              "description": "平均绩点",
+              "nullable": true
+            }
+          }
+        },
+        "semesters": {
+          "type": "array",
+          "description": "本人成绩中可用的学期",
+          "items": {
+            "$ref": "#/components/schemas/Semester"
+          }
+        }
+      }
+    },
+    "ClassDistributionData": {
+      "type": "object",
+      "description": "匿名教学班成绩分布",
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "ready：可用；insufficient：有效样本不足 10 人"
+        },
+        "distribution": {
+          "type": "array",
+          "description": "按分数升序，仅包含实际分数",
+          "items": {
+            "type": "object",
+            "description": "分数计数",
+            "properties": {
+              "score": {
+                "type": "number",
+                "description": "换算分数"
+              },
+              "count": {
+                "type": "integer",
+                "description": "匿名人数"
+              }
+            }
+          }
+        }
+      }
+    },
+    "PassRateCourse": {
+      "type": "object",
+      "description": "可查看通过率的课程",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "课程记录标识；查询班级分布时与学年、学期一起使用"
+        },
+        "academicYear": {
+          "type": "string",
+          "description": "学年名称，例如 2025-2026"
+        },
+        "term": {
+          "type": "integer",
+          "description": "学期，1、2 或 3",
+          "nullable": true
+        },
+        "courseCode": {
+          "type": "string",
+          "description": "课程号"
+        },
+        "courseName": {
+          "type": "string",
+          "description": "课程名称"
+        },
+        "teachingClass": {
+          "type": "string",
+          "description": "教学班名称"
+        },
+        "teacherName": {
+          "type": "string",
+          "description": "教师姓名"
+        },
+        "department": {
+          "type": "string",
+          "description": "开课学院"
+        },
+        "courseNatureCode": {
+          "type": "string",
+          "description": "课程性质编码",
+          "nullable": true
+        },
+        "courseNature": {
+          "type": "string",
+          "description": "课程性质",
+          "nullable": true
+        },
+        "gradeNatureCode": {
+          "type": "string",
+          "description": "成绩性质编码",
+          "nullable": true
+        },
+        "gradeNature": {
+          "type": "string",
+          "description": "正常考试、补考、缓考等成绩性质",
+          "nullable": true
+        },
+        "credits": {
+          "type": "number",
+          "description": "学分",
+          "nullable": true
+        },
+        "finalScore": {
+          "$ref": "#/components/schemas/GradeValue"
+        },
+        "calculationScore": {
+          "type": "number",
+          "description": "用于统计的换算分数；文字状态可能无法换算",
+          "nullable": true
+        },
+        "gradePoint": {
+          "type": "number",
+          "description": "绩点",
+          "nullable": true
+        },
+        "countsTowardGradePointAverage": {
+          "type": "boolean",
+          "description": "绩点计算兼容标记"
+        },
+        "gradeRemark": {
+          "type": "string",
+          "description": "额外成绩备注",
+          "nullable": true
+        },
+        "components": {
+          "type": "array",
+          "description": "成绩分项；补考或缓考可能为空",
+          "items": {
+            "type": "object",
+            "description": "分项",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "名称"
+              },
+              "weightPercent": {
+                "type": "number",
+                "description": "权重，百分比",
+                "nullable": true
+              },
+              "score": {
+                "$ref": "#/components/schemas/GradeValue"
+              }
+            }
+          }
+        },
+        "statisticsKey": {
+          "type": "string",
+          "description": "64 位课程统计键，用作 courseKey"
+        },
+        "hasOwnGrade": {
+          "type": "boolean",
+          "description": "是否已有本人成绩"
+        }
+      }
+    },
+    "PassRatesData": {
+      "type": "object",
+      "description": "课程通过率",
+      "properties": {
+        "courses": {
+          "type": "array",
+          "description": "本人的课程选项",
+          "items": {
+            "$ref": "#/components/schemas/PassRateCourse"
+          }
+        },
+        "selectedCourse": {
+          "type": "object",
+          "description": "可查看通过率的课程",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "课程记录标识；查询班级分布时与学年、学期一起使用"
+            },
+            "academicYear": {
+              "type": "string",
+              "description": "学年名称，例如 2025-2026"
+            },
+            "term": {
+              "type": "integer",
+              "description": "学期，1、2 或 3",
+              "nullable": true
+            },
+            "courseCode": {
+              "type": "string",
+              "description": "课程号"
+            },
+            "courseName": {
+              "type": "string",
+              "description": "课程名称"
+            },
+            "teachingClass": {
+              "type": "string",
+              "description": "教学班名称"
+            },
+            "teacherName": {
+              "type": "string",
+              "description": "教师姓名"
+            },
+            "department": {
+              "type": "string",
+              "description": "开课学院"
+            },
+            "courseNatureCode": {
+              "type": "string",
+              "description": "课程性质编码",
+              "nullable": true
+            },
+            "courseNature": {
+              "type": "string",
+              "description": "课程性质",
+              "nullable": true
+            },
+            "gradeNatureCode": {
+              "type": "string",
+              "description": "成绩性质编码",
+              "nullable": true
+            },
+            "gradeNature": {
+              "type": "string",
+              "description": "正常考试、补考、缓考等成绩性质",
+              "nullable": true
+            },
+            "credits": {
+              "type": "number",
+              "description": "学分",
+              "nullable": true
+            },
+            "finalScore": {
+              "$ref": "#/components/schemas/GradeValue"
+            },
+            "calculationScore": {
+              "type": "number",
+              "description": "用于统计的换算分数；文字状态可能无法换算",
+              "nullable": true
+            },
+            "gradePoint": {
+              "type": "number",
+              "description": "绩点",
+              "nullable": true
+            },
+            "countsTowardGradePointAverage": {
+              "type": "boolean",
+              "description": "绩点计算兼容标记"
+            },
+            "gradeRemark": {
+              "type": "string",
+              "description": "额外成绩备注",
+              "nullable": true
+            },
+            "components": {
+              "type": "array",
+              "description": "成绩分项；补考或缓考可能为空",
+              "items": {
+                "type": "object",
+                "description": "分项",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "名称"
+                  },
+                  "weightPercent": {
+                    "type": "number",
+                    "description": "权重，百分比",
+                    "nullable": true
+                  },
+                  "score": {
+                    "$ref": "#/components/schemas/GradeValue"
+                  }
+                }
+              }
+            },
+            "statisticsKey": {
+              "type": "string",
+              "description": "64 位课程统计键，用作 courseKey"
+            },
+            "hasOwnGrade": {
+              "type": "boolean",
+              "description": "是否已有本人成绩"
+            }
+          },
+          "nullable": true
+        },
+        "percentageOnly": {
+          "type": "boolean",
+          "description": "为 true 时只展示百分比，不展示人数和年级"
+        },
+        "status": {
+          "type": "string",
+          "description": "ready 或 collecting"
+        },
+        "message": {
+          "type": "string",
+          "description": "状态说明",
+          "nullable": true
+        },
+        "statistics": {
+          "type": "object",
+          "description": "聚合统计",
+          "properties": {
+            "cohorts": {
+              "type": "array",
+              "description": "实际纳入的年级；全校统计为空数组",
+              "items": {
+                "type": "integer",
+                "description": "年级"
+              }
+            },
+            "totalCount": {
+              "type": "integer",
+              "description": "有效样本数"
+            },
+            "passedCount": {
+              "type": "integer",
+              "description": "通过人数"
+            },
+            "failedCount": {
+              "type": "integer",
+              "description": "未通过人数"
+            },
+            "passRate": {
+              "type": "number",
+              "description": "通过率，0–100，单位 %"
+            },
+            "averageScore": {
+              "type": "number",
+              "description": "平均换算分数"
+            },
+            "distribution": {
+              "type": "array",
+              "description": "分数段分布",
+              "items": {
+                "type": "object",
+                "description": "分段",
+                "properties": {
+                  "band": {
+                    "type": "string",
+                    "description": "分数段"
+                  },
+                  "count": {
+                    "type": "integer",
+                    "description": "人数"
+                  }
+                }
+              }
+            },
+            "scores": {
+              "type": "array",
+              "description": "原始成绩分布",
+              "items": {
+                "type": "object",
+                "description": "计数",
+                "properties": {
+                  "score": {
+                    "type": "string",
+                    "description": "成绩文本"
+                  },
+                  "count": {
+                    "type": "integer",
+                    "description": "人数"
+                  }
+                }
+              }
+            }
+          },
+          "nullable": true
+        }
+      }
+    },
+    "MessagesData": {
+      "type": "object",
+      "description": "本人校园消息；当前最多保留最新 15 条",
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "当前页记录",
+          "items": {
+            "type": "object",
+            "description": "依据 type 和 parsed 读取对应字段",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "消息标识"
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "学校当地时间，YYYY-MM-DD HH:mm:ss"
+              },
+              "type": {
+                "type": "string",
+                "description": "course_rescheduled、makeup_class、course_cancelled 或 other"
+              },
+              "title": {
+                "type": "string",
+                "description": "标题"
+              },
+              "parsed": {
+                "type": "boolean",
+                "description": "是否有结构化课程安排"
+              },
+              "courseName": {
+                "type": "string",
+                "description": "已解析消息的课程名称"
+              },
+              "teacherName": {
+                "type": "string",
+                "description": "原教师姓名"
+              },
+              "newTeacherName": {
+                "type": "string",
+                "description": "调课后的教师姓名"
+              },
+              "originalSchedule": {
+                "$ref": "#/components/schemas/MessageSchedule"
+              },
+              "newSchedule": {
+                "$ref": "#/components/schemas/MessageSchedule"
+              },
+              "schedule": {
+                "$ref": "#/components/schemas/MessageSchedule"
+              },
+              "content": {
+                "type": "string",
+                "description": "未解析消息的文本"
+              }
+            }
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/Pagination"
+        }
+      }
+    },
+    "NoticesData": {
+      "type": "object",
+      "description": "学校通知；当前最多保留 50 条可见通知",
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "当前页记录",
+          "items": {
+            "type": "object",
+            "description": "通知",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "详情查询用标识"
+              },
+              "title": {
+                "type": "string",
+                "description": "标题"
+              },
+              "link": {
+                "type": "string",
+                "description": "学校来源页面"
+              },
+              "publishedAt": {
+                "type": "string",
+                "description": "发布日期"
+              },
+              "semesterId": {
+                "type": "string",
+                "description": "关联学期标识",
+                "nullable": true
+              }
+            }
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/Pagination"
+        }
+      }
+    },
+    "NoticeDetailData": {
+      "type": "object",
+      "description": "通知正文",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "通知标识"
+        },
+        "title": {
+          "type": "string",
+          "description": "标题"
+        },
+        "publisher": {
+          "type": "string",
+          "description": "发布单位",
+          "nullable": true
+        },
+        "publishedAt": {
+          "type": "string",
+          "description": "发布时间，学校当地时间"
+        },
+        "contentHtml": {
+          "type": "string",
+          "description": "安全正文 HTML；渲染时仍应使用受限内容容器"
+        },
+        "contentBlocks": {
+          "type": "array",
+          "description": "按原文顺序的结构化正文",
+          "items": {
+            "$ref": "#/components/schemas/NoticeBlock"
+          }
+        },
+        "link": {
+          "type": "string",
+          "description": "学校来源页面"
+        }
+      }
+    },
+    "RoomOptionsData": {
+      "type": "object",
+      "description": "空教室查询所需选项",
+      "properties": {
+        "minDate": {
+          "type": "string",
+          "description": "最早可查询日期",
+          "format": "date"
+        },
+        "maxDate": {
+          "type": "string",
+          "description": "最晚可查询日期",
+          "format": "date"
+        },
+        "campuses": {
+          "type": "array",
+          "description": "校区",
+          "items": {
+            "$ref": "#/components/schemas/SelectOption"
+          }
+        },
+        "buildings": {
+          "type": "array",
+          "description": "指定校区的楼栋；未指定校区时为空",
+          "items": {
+            "$ref": "#/components/schemas/SelectOption"
+          }
+        },
+        "buildingsByCampus": {
+          "type": "object",
+          "description": "键为校区编码，值为楼栋选项数组",
+          "additionalProperties": {
+            "type": "array",
+            "description": "楼栋选项",
+            "items": {
+              "$ref": "#/components/schemas/SelectOption"
+            }
+          }
+        },
+        "periods": {
+          "type": "array",
+          "description": "节次及时间",
+          "items": {
+            "$ref": "#/components/schemas/Period"
+          }
+        },
+        "periodGroups": {
+          "type": "array",
+          "description": "节次分组",
+          "items": {
+            "type": "object",
+            "description": "分组",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "morning、noon、afternoon 或 evening"
+              },
+              "label": {
+                "type": "string",
+                "description": "名称"
+              },
+              "periods": {
+                "type": "array",
+                "description": "节次编号",
+                "items": {
+                  "type": "integer",
+                  "description": "节次"
+                }
+              }
+            }
+          }
+        },
+        "source": {
+          "type": "object",
+          "description": "选项来源",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "来源名称"
+            },
+            "updatedAt": {
+              "type": "string",
+              "description": "更新时间",
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    },
+    "RoomsData": {
+      "type": "object",
+      "description": "所选时间内可用的空教室",
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "当前页记录",
+          "items": {
+            "type": "object",
+            "description": "教室",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "标识"
+              },
+              "code": {
+                "type": "string",
+                "description": "编码"
+              },
+              "name": {
+                "type": "string",
+                "description": "名称"
+              },
+              "campus": {
+                "type": "object",
+                "description": "校区",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "编码"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "名称"
+                  }
+                }
+              },
+              "building": {
+                "type": "object",
+                "description": "楼栋",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "编码"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "名称"
+                  }
+                }
+              },
+              "floor": {
+                "type": "string",
+                "description": "楼层"
+              },
+              "type": {
+                "type": "string",
+                "description": "教室类型"
+              },
+              "capacity": {
+                "type": "integer",
+                "description": "容量"
+              }
+            }
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/Pagination"
+        },
+        "query": {
+          "type": "object",
+          "description": "规范化的查询条件",
+          "properties": {
+            "date": {
+              "type": "string",
+              "description": "日期",
+              "format": "date"
+            },
+            "periods": {
+              "type": "array",
+              "description": "节次",
+              "items": {
+                "type": "integer",
+                "description": "编号"
+              }
+            },
+            "campusId": {
+              "type": "string",
+              "description": "校区编码"
+            },
+            "buildingIds": {
+              "type": "array",
+              "description": "楼栋编码",
+              "items": {
+                "type": "string",
+                "description": "编码"
+              }
+            }
+          }
+        },
+        "dataUpdatedAt": {
+          "type": "string",
+          "description": "学校返回的数据更新时间，学校当地时间；可能为 null",
+          "nullable": true
+        },
+        "summary": {
+          "type": "object",
+          "description": "全部结果汇总",
+          "properties": {
+            "totalRooms": {
+              "type": "integer",
+              "description": "教室总数"
+            },
+            "buildings": {
+              "type": "array",
+              "description": "分楼栋统计",
+              "items": {
+                "type": "object",
+                "description": "楼栋",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "编码"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "名称"
+                  },
+                  "roomCount": {
+                    "type": "integer",
+                    "description": "可用教室数"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ExamOptionsData": {
+      "type": "object",
+      "description": "考试学期目录",
+      "properties": {
+        "semesters": {
+          "type": "array",
+          "description": "可用学期",
+          "items": {
+            "$ref": "#/components/schemas/Semester"
+          }
+        },
+        "defaultSemester": {
+          "type": "object",
+          "description": "学期选项；直接使用返回的 id",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "学期标识，例如 2026-1"
+            },
+            "academicYear": {
+              "type": "integer",
+              "description": "学年起始年份"
+            },
+            "academicYearLabel": {
+              "type": "string",
+              "description": "完整学年，例如 2026-2027"
+            },
+            "term": {
+              "type": "integer",
+              "description": "1、2 或 3"
+            },
+            "label": {
+              "type": "string",
+              "description": "学期显示名称"
+            }
+          },
+          "nullable": true
+        }
+      }
+    },
+    "ExamsData": {
+      "type": "object",
+      "description": "本人考试安排",
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "当前页记录",
+          "items": {
+            "type": "object",
+            "description": "考试",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "考试标识"
+              },
+              "academicYear": {
+                "type": "string",
+                "description": "学年"
+              },
+              "term": {
+                "type": "integer",
+                "description": "学期"
+              },
+              "arrangementType": {
+                "type": "string",
+                "description": "regular、makeup、deferred 或 makeup_deferred"
+              },
+              "arrangementTypeLabel": {
+                "type": "string",
+                "description": "考试类型名称"
+              },
+              "examName": {
+                "type": "string",
+                "description": "考试名称"
+              },
+              "course": {
+                "type": "object",
+                "description": "课程",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "课程号"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "课程名"
+                  },
+                  "credits": {
+                    "type": "number",
+                    "description": "学分"
+                  }
+                }
+              },
+              "time": {
+                "type": "object",
+                "description": "考试时间",
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "description": "日期",
+                    "format": "date"
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "description": "开始时间 HH:mm",
+                    "nullable": true
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "description": "结束时间 HH:mm",
+                    "nullable": true
+                  },
+                  "startAt": {
+                    "type": "string",
+                    "description": "含 +08:00 时区的开始时间",
+                    "format": "date-time",
+                    "nullable": true
+                  },
+                  "endAt": {
+                    "type": "string",
+                    "description": "含 +08:00 时区的结束时间",
+                    "format": "date-time",
+                    "nullable": true
+                  },
+                  "raw": {
+                    "type": "string",
+                    "description": "学校原始时间描述"
+                  }
+                }
+              },
+              "location": {
+                "type": "object",
+                "description": "地点",
+                "properties": {
+                  "room": {
+                    "type": "string",
+                    "description": "考场"
+                  },
+                  "campus": {
+                    "type": "string",
+                    "description": "校区"
+                  }
+                }
+              },
+              "method": {
+                "type": "string",
+                "description": "考试方式"
+              },
+              "retake": {
+                "type": "boolean",
+                "description": "是否重修"
+              },
+              "teachingClass": {
+                "type": "string",
+                "description": "教学班"
+              },
+              "department": {
+                "type": "string",
+                "description": "开课学院"
+              },
+              "teacherNames": {
+                "type": "array",
+                "description": "教师姓名",
+                "items": {
+                  "type": "string",
+                  "description": "姓名"
+                }
+              },
+              "note": {
+                "type": "string",
+                "description": "备注"
+              }
+            }
+          }
+        },
+        "pagination": {
+          "$ref": "#/components/schemas/Pagination"
+        },
+        "semester": {
+          "type": "object",
+          "description": "学期选项；直接使用返回的 id",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "学期标识，例如 2026-1"
+            },
+            "academicYear": {
+              "type": "integer",
+              "description": "学年起始年份"
+            },
+            "academicYearLabel": {
+              "type": "string",
+              "description": "完整学年，例如 2026-2027"
+            },
+            "term": {
+              "type": "integer",
+              "description": "1、2 或 3"
+            },
+            "label": {
+              "type": "string",
+              "description": "学期显示名称"
+            }
+          },
+          "nullable": true
+        },
+        "semesters": {
+          "type": "array",
+          "description": "可用学期",
+          "items": {
+            "$ref": "#/components/schemas/Semester"
+          }
+        },
+        "summary": {
+          "type": "object",
+          "description": "全部筛选结果汇总",
+          "properties": {
+            "total": {
+              "type": "integer",
+              "description": "总数"
+            },
+            "regular": {
+              "type": "integer",
+              "description": "正常考试数"
+            },
+            "makeup": {
+              "type": "integer",
+              "description": "补考数"
+            },
+            "deferred": {
+              "type": "integer",
+              "description": "缓考数"
+            },
+            "makeupDeferred": {
+              "type": "integer",
+              "description": "补/缓考数"
+            }
+          }
+        }
+      }
+    },
+    "TimetableData": {
+      "type": "object",
+      "description": "本人课表",
+      "properties": {
+        "semester": {
+          "type": "object",
+          "description": "学期选项；直接使用返回的 id",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "学期标识，例如 2026-1"
+            },
+            "academicYear": {
+              "type": "integer",
+              "description": "学年起始年份"
+            },
+            "academicYearLabel": {
+              "type": "string",
+              "description": "完整学年，例如 2026-2027"
+            },
+            "term": {
+              "type": "integer",
+              "description": "1、2 或 3"
+            },
+            "label": {
+              "type": "string",
+              "description": "学期显示名称"
+            }
+          },
+          "nullable": true
+        },
+        "semesters": {
+          "type": "array",
+          "description": "可用学期",
+          "items": {
+            "$ref": "#/components/schemas/Semester"
+          }
+        },
+        "currentSemester": {
+          "type": "object",
+          "description": "当前学期；无法确认时为 null",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "学期标识，例如 2026-1"
+            },
+            "academicYear": {
+              "type": "integer",
+              "description": "学年起始年份"
+            },
+            "academicYearLabel": {
+              "type": "string",
+              "description": "完整学年，例如 2026-2027"
+            },
+            "term": {
+              "type": "integer",
+              "description": "1、2 或 3"
+            },
+            "label": {
+              "type": "string",
+              "description": "学期显示名称"
+            },
+            "startDate": {
+              "type": "string",
+              "description": "开始日期",
+              "format": "date"
+            },
+            "endDate": {
+              "type": "string",
+              "description": "结束日期",
+              "format": "date"
+            }
+          },
+          "nullable": true
+        },
+        "semesterCalendar": {
+          "type": "object",
+          "description": "所选学期周次日期映射；无可用数据时为 null",
+          "properties": {
+            "semesterId": {
+              "type": "string",
+              "description": "学期标识"
+            },
+            "startDate": {
+              "type": "string",
+              "description": "开始日期",
+              "format": "date"
+            },
+            "endDate": {
+              "type": "string",
+              "description": "结束日期",
+              "format": "date"
+            },
+            "totalWeeks": {
+              "type": "integer",
+              "description": "总周数"
+            },
+            "weeks": {
+              "type": "array",
+              "description": "实际周次映射",
+              "items": {
+                "type": "object",
+                "description": "周",
+                "properties": {
+                  "weekNumber": {
+                    "type": "integer",
+                    "description": "周次"
+                  },
+                  "startDate": {
+                    "type": "string",
+                    "description": "周开始",
+                    "format": "date"
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "description": "周结束",
+                    "format": "date"
+                  }
+                }
+              }
+            }
+          },
+          "nullable": true
+        },
+        "dataSource": {
+          "type": "string",
+          "description": "teaching_system 或 one_stop"
+        },
+        "sourceTimeZone": {
+          "type": "string",
+          "description": "课程周期时间的来源时区，Asia/Shanghai"
+        },
+        "periods": {
+          "type": "array",
+          "description": "节次",
+          "items": {
+            "$ref": "#/components/schemas/Period"
+          }
+        },
+        "courses": {
+          "type": "array",
+          "description": "网格课程",
+          "items": {
+            "type": "object",
+            "description": "课程",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "课程标识"
+              },
+              "courseCode": {
+                "type": "string",
+                "description": "课程号"
+              },
+              "courseName": {
+                "type": "string",
+                "description": "课程名称"
+              },
+              "teachingClass": {
+                "type": "string",
+                "description": "教学班"
+              },
+              "teacherNames": {
+                "type": "array",
+                "description": "教师",
+                "items": {
+                  "type": "string",
+                  "description": "姓名"
+                }
+              },
+              "credits": {
+                "type": "number",
+                "description": "学分",
+                "nullable": true
+              },
+              "category": {
+                "type": "string",
+                "description": "课程类别"
+              },
+              "nature": {
+                "type": "string",
+                "description": "课程性质"
+              },
+              "assessmentMethod": {
+                "type": "string",
+                "description": "考核方式"
+              },
+              "examMethod": {
+                "type": "string",
+                "description": "考试方式"
+              },
+              "teachingClassComposition": {
+                "type": "array",
+                "description": "教学班组成",
+                "items": {
+                  "type": "string",
+                  "description": "班级"
+                }
+              },
+              "hours": {
+                "type": "object",
+                "description": "课时",
+                "properties": {
+                  "composition": {
+                    "type": "string",
+                    "description": "课时组成"
+                  },
+                  "weekly": {
+                    "type": "number",
+                    "description": "周课时",
+                    "nullable": true
+                  },
+                  "total": {
+                    "type": "number",
+                    "description": "总课时",
+                    "nullable": true
+                  }
+                }
+              },
+              "retake": {
+                "type": "boolean",
+                "description": "是否重修"
+              },
+              "selectionStatus": {
+                "type": "string",
+                "description": "selected 或 pending"
+              },
+              "arrangements": {
+                "type": "array",
+                "description": "具体上课安排",
+                "items": {
+                  "type": "object",
+                  "description": "安排",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "安排标识"
+                    },
+                    "weekday": {
+                      "type": "integer",
+                      "description": "星期一为 1，星期日为 7"
+                    },
+                    "weekdayLabel": {
+                      "type": "string",
+                      "description": "星期名称"
+                    },
+                    "periodStart": {
+                      "type": "integer",
+                      "description": "开始节次"
+                    },
+                    "periodEnd": {
+                      "type": "integer",
+                      "description": "结束节次"
+                    },
+                    "periods": {
+                      "type": "array",
+                      "description": "完整节次",
+                      "items": {
+                        "type": "integer",
+                        "description": "节次"
+                      }
+                    },
+                    "startTime": {
+                      "type": "string",
+                      "description": "学校当地开始时间，HH:mm"
+                    },
+                    "endTime": {
+                      "type": "string",
+                      "description": "学校当地结束时间，HH:mm"
+                    },
+                    "weekText": {
+                      "type": "string",
+                      "description": "周次显示文本"
+                    },
+                    "weeks": {
+                      "type": "array",
+                      "description": "实际周次；计算日期时使用此数组",
+                      "items": {
+                        "type": "integer",
+                        "description": "周次"
+                      }
+                    },
+                    "activityType": {
+                      "type": "string",
+                      "description": "活动类型"
+                    },
+                    "activityTypeLabel": {
+                      "type": "string",
+                      "description": "活动类型名称"
+                    },
+                    "teacherNames": {
+                      "type": "array",
+                      "description": "教师",
+                      "items": {
+                        "type": "string",
+                        "description": "姓名"
+                      }
+                    },
+                    "location": {
+                      "type": "object",
+                      "description": "上课地点",
+                      "properties": {
+                        "campus": {
+                          "type": "string",
+                          "description": "校区"
+                        },
+                        "building": {
+                          "type": "string",
+                          "description": "楼栋"
+                        },
+                        "room": {
+                          "type": "string",
+                          "description": "教室"
+                        },
+                        "display": {
+                          "type": "string",
+                          "description": "显示名称"
+                        }
+                      }
+                    },
+                    "teachingMethod": {
+                      "type": "string",
+                      "description": "教学方式"
+                    },
+                    "selectionStatus": {
+                      "type": "string",
+                      "description": "选课状态"
+                    },
+                    "adjusted": {
+                      "type": "boolean",
+                      "description": "是否调课"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "additionalCourses": {
+          "type": "array",
+          "description": "实践课等非网格课程",
+          "items": {
+            "type": "object",
+            "description": "课程",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "标识"
+              },
+              "type": {
+                "type": "string",
+                "description": "类型"
+              },
+              "description": {
+                "type": "string",
+                "description": "安排说明"
+              }
+            }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "description": "课表汇总",
+          "properties": {
+            "courseCount": {
+              "type": "integer",
+              "description": "课程数"
+            },
+            "arrangementCount": {
+              "type": "integer",
+              "description": "安排数"
+            },
+            "maxWeek": {
+              "type": "integer",
+              "description": "最大周次"
+            }
+          }
+        }
+      }
+    },
+    "ScheduleData": {
+      "type": "object",
+      "description": "本人在小程序保存的日程副本",
+      "properties": {
+        "plans": {
+          "type": "array",
+          "description": "日程；未保存时为空数组",
+          "items": {
+            "type": "object",
+            "description": "日程",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "标识"
+              },
+              "title": {
+                "type": "string",
+                "description": "标题"
+              },
+              "date": {
+                "type": "string",
+                "description": "开始日期",
+                "format": "date"
+              },
+              "startTime": {
+                "type": "string",
+                "description": "开始时间，HH:mm"
+              },
+              "endDate": {
+                "type": "string",
+                "description": "结束日期",
+                "format": "date"
+              },
+              "endTime": {
+                "type": "string",
+                "description": "结束时间，HH:mm"
+              },
+              "done": {
+                "type": "boolean",
+                "description": "是否完成"
+              }
+            }
+          }
+        },
+        "clientUpdatedAt": {
+          "type": "string",
+          "description": "小程序最后保存时间",
+          "format": "date-time",
+          "nullable": true
+        }
+      }
+    },
+    "ElectricityData": {
+      "type": "object",
+      "description": "已有寝室绑定与最近电费数据",
+      "properties": {
+        "binding": {
+          "type": "object",
+          "description": "个人绑定；未绑定为 null",
+          "properties": {
+            "buildingId": {
+              "type": "string",
+              "description": "宿舍楼编码"
+            },
+            "buildingName": {
+              "type": "string",
+              "description": "宿舍楼名称"
+            },
+            "roomNumber": {
+              "type": "string",
+              "description": "规范化寝室号"
+            },
+            "boundAt": {
+              "type": "string",
+              "description": "首次绑定时间",
+              "format": "date-time"
+            },
+            "changedAt": {
+              "type": "string",
+              "description": "最近换绑时间",
+              "format": "date-time",
+              "nullable": true
+            }
+          },
+          "nullable": true
+        },
+        "account": {
+          "type": "object",
+          "description": "最近成功查询的账单；无数据为 null",
+          "properties": {
+            "billedElectricityKwh": {
+              "type": "number",
+              "description": "结算周期用电量，kWh"
+            },
+            "electricityFeeYuan": {
+              "type": "number",
+              "description": "结算周期电费，元"
+            },
+            "remainingAmountYuan": {
+              "type": "number",
+              "description": "余额，元；可能为负数"
+            },
+            "availableElectricitySubsidyKwh": {
+              "type": "number",
+              "description": "可用电补助，kWh；缺失为 null",
+              "nullable": true
+            },
+            "lastPaymentDate": {
+              "type": "string",
+              "description": "最近缴费日期",
+              "format": "date",
+              "nullable": true
+            },
+            "lastSettlementDate": {
+              "type": "string",
+              "description": "最近结算日期",
+              "format": "date",
+              "nullable": true
+            },
+            "dailyElectricityFees": {
+              "type": "array",
+              "description": "最近 7 个有记录日期的电费，按日期升序",
+              "items": {
+                "type": "object",
+                "description": "每日电费",
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "description": "日期",
+                    "format": "date"
+                  },
+                  "amountYuan": {
+                    "type": "number",
+                    "description": "金额，元"
+                  }
+                }
+              }
+            }
+          },
+          "nullable": true
+        },
+        "accountFetchedAt": {
+          "type": "string",
+          "description": "账单实际查询时间；不能用 meta.fetchedAt 代替",
+          "format": "date-time",
+          "nullable": true
+        }
+      }
+    },
+    "ElectricityBuildingsData": {
+      "type": "object",
+      "description": "可用宿舍楼",
+      "properties": {
+        "buildings": {
+          "type": "array",
+          "description": "按学校返回顺序排列",
+          "items": {
+            "type": "object",
+            "description": "宿舍楼",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "编码"
+              },
+              "name": {
+                "type": "string",
+                "description": "名称"
+              }
+            }
+          }
+        }
+      }
+    },
+    "FeedData": {
+      "type": "object",
+      "description": "校园应用内容",
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "公告和通知合并列表，最多 100 条",
+          "items": {
+            "$ref": "#/components/schemas/Publication"
+          }
+        },
+        "announcements": {
+          "type": "array",
+          "description": "公告列表",
+          "items": {
+            "$ref": "#/components/schemas/Publication"
+          }
+        },
+        "notifications": {
+          "type": "array",
+          "description": "通知列表",
+          "items": {
+            "$ref": "#/components/schemas/Publication"
+          }
+        },
+        "unreadCount": {
+          "type": "integer",
+          "description": "小程序中的未读数"
+        }
+      }
+    },
+    "CalendarDataResponse": {
+      "type": "object",
+      "description": "获取可用学年、校历版本及原图下载路径。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/CalendarData"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "TimetableDataResponse": {
+      "type": "object",
+      "description": "获取本人课表、可用学期及每段课程的周次和时间安排。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/TimetableData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "ScheduleDataResponse": {
+      "type": "object",
+      "description": "读取本人在 Easy SWU 小程序中保存的日程。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/ScheduleData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "GradesDataResponse": {
+      "type": "object",
+      "description": "按学年、学期和关键词查询本人成绩，并返回完整筛选结果的汇总。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/GradesData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "ClassDistributionDataResponse": {
+      "type": "object",
+      "description": "查询本人某条成绩对应教学班的匿名分数计数。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/ClassDistributionData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "PassRatesDataResponse": {
+      "type": "object",
+      "description": "获取本人已修或课表课程的匿名通过率统计及可选课程。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/PassRatesData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "ExamsDataResponse": {
+      "type": "object",
+      "description": "按学期查询本人的正常考试、补考与缓考安排。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/ExamsData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "ExamOptionsDataResponse": {
+      "type": "object",
+      "description": "获取本人可查询的考试学期与默认学期。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/ExamOptionsData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "MessagesDataResponse": {
+      "type": "object",
+      "description": "读取本人的调课、补课、停课等校园消息。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/MessagesData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "NoticesDataResponse": {
+      "type": "object",
+      "description": "分页查询对学生可见的学校通知，并支持标题搜索。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/NoticesData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "NoticeDetailDataResponse": {
+      "type": "object",
+      "description": "读取学校通知的正文、结构化段落与附件信息。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/NoticeDetailData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "RoomOptionsDataResponse": {
+      "type": "object",
+      "description": "获取校区、楼栋、节次及当前可查询的日期范围。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/RoomOptionsData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "RoomsDataResponse": {
+      "type": "object",
+      "description": "查询指定日期、校区、楼栋和节次内可用的教室。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/RoomsData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "ElectricityDataResponse": {
+      "type": "object",
+      "description": "读取本人已绑定寝室的最近电费余额与用电记录。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/ElectricityData"
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "ElectricityBuildingsDataResponse": {
+      "type": "object",
+      "description": "读取校园能源系统的宿舍楼编码与名称。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/ElectricityBuildingsData"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    },
+    "FeedDataResponse": {
+      "type": "object",
+      "description": "读取 Easy SWU 校园应用中对本人可见的公告与通知。",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ],
+          "description": "请求成功"
+        },
+        "data": {
+          "$ref": "#/components/schemas/FeedData"
+        }
+      },
+      "required": [
+        "success",
+        "data"
+      ]
+    }
+  },
+  "endpoints": {
+    "/teaching/calendar": {
+      "group": "教学日历",
+      "summary": "获取可用学年、校历版本及原图下载路径。",
+      "notes": [
+        "首次请求可以不传 academicYear；后续使用 availableAcademicYears 中的值。",
+        "imageUrl 是本平台相对路径；请求原图时仍需 Authorization，图片请求单独计入额度。"
+      ],
+      "related": [
+        "/teaching/calendar/image"
+      ],
+      "parameters": {
+        "academicYear": {
+          "description": "学年起始年份，2000–2100；省略时为已同步的最新学年。",
+          "schema": {
+            "type": "integer",
+            "description": "学年起始年份",
+            "minimum": 2000,
+            "maximum": 2100
+          },
+          "example": 2026
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/CalendarDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "academicYear": "2026-2027",
+          "startYear": 2026,
+          "availableAcademicYears": [
+            2026,
+            2025
+          ],
+          "availableCalendars": [
+            {
+              "startYear": 2026,
+              "academicYear": "2026-2027"
+            },
+            {
+              "startYear": 2025,
+              "academicYear": "2025-2026"
+            }
+          ],
+          "publishedAt": "2026-06-16",
+          "sourcePageUrl": "https://ugs.swu.edu.cn/info/1041/0000.htm",
+          "contentType": "image/png",
+          "size": 1234567,
+          "version": "4be27e6d9e0d0af05f9a18d0d8c348650452ac36330f85878f0c2f51293c50a7",
+          "imageUrl": "/v1/teaching/calendar/image?academicYear=2026&version=4be27e6d9e0d0af05f9a18d0d8c348650452ac36330f85878f0c2f51293c50a7"
+        }
+      }
+    },
+    "/teaching/calendar/image": {
+      "group": "教学日历",
+      "summary": "下载指定学年的校历图片，成功时直接返回图片字节。",
+      "notes": [
+        "优先使用校历元数据返回的完整 imageUrl，不需要自行拼接 version。",
+        "按 Content-Type 识别 PNG、JPEG 或 WebP；错误响应仍为 JSON。"
+      ],
+      "related": [
+        "/teaching/calendar"
+      ],
+      "parameters": {
+        "academicYear": {
+          "description": "学年起始年份；省略时采用接口默认学年。",
+          "schema": {
+            "type": "integer",
+            "description": "学年起始年份",
+            "minimum": 2000,
+            "maximum": 2100
+          },
+          "example": 2026
+        },
+        "version": {
+          "description": "原样传入校历元数据的 version，必须为 64 位小写十六进制标识。",
+          "schema": {
+            "type": "string",
+            "description": "不透明图片版本",
+            "pattern": "^[a-f0-9]{64}$",
+            "maxLength": 64
+          }
+        }
+      },
+      "content_type": "image/*",
+      "response_schema": {
+        "type": "string",
+        "format": "binary"
+      },
+      "response_example": null
+    },
+    "/teaching/timetable": {
+      "group": "课表与日程",
+      "summary": "获取本人课表、可用学期及每段课程的周次和时间安排。",
+      "notes": [
+        "用 arrangements[].weeks 和 semesterCalendar 映射具体上课日期；weekText 仅用于显示。",
+        "周期时间以 sourceTimeZone 为准；转换成完整日期时间后再换算至用户所在时区。",
+        "已有数据可能先返回；meta.stale=true 时显示更新时间，不应将旧数据视为最新。"
+      ],
+      "related": [
+        "/teaching/schedule",
+        "/teaching/pass-rates"
+      ],
+      "parameters": {
+        "semester": {
+          "description": "先从本接口或学期选项接口获取 id；不要按日期推算。省略时采用默认学期。",
+          "schema": {
+            "type": "string",
+            "description": "学期标识",
+            "pattern": "^\\d{4}-[123]$"
+          },
+          "example": "2026-1"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/TimetableDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "semester": {
+            "id": "2026-1",
+            "academicYear": 2026,
+            "academicYearLabel": "2026-2027",
+            "term": 1,
+            "label": "2026-2027 · 第一学期"
+          },
+          "semesters": [
+            {
+              "id": "2026-1",
+              "academicYear": 2026,
+              "academicYearLabel": "2026-2027",
+              "term": 1,
+              "label": "2026-2027 · 第一学期"
+            },
+            {
+              "id": "2025-3",
+              "academicYear": 2025,
+              "academicYearLabel": "2025-2026",
+              "term": 3,
+              "label": "2025-2026 · 第三学期"
+            },
+            {
+              "id": "2025-2",
+              "academicYear": 2025,
+              "academicYearLabel": "2025-2026",
+              "term": 2,
+              "label": "2025-2026 · 第二学期"
+            }
+          ],
+          "currentSemester": {
+            "id": "2026-1",
+            "academicYear": 2026,
+            "academicYearLabel": "2026-2027",
+            "term": 1,
+            "label": "2026-2027 · 第一学期",
+            "startDate": "2026-08-31",
+            "endDate": "2027-01-17"
+          },
+          "semesterCalendar": {
+            "semesterId": "2026-1",
+            "startDate": "2026-08-31",
+            "endDate": "2027-01-17",
+            "totalWeeks": 20,
+            "weeks": [
+              {
+                "weekNumber": 1,
+                "startDate": "2026-08-31",
+                "endDate": "2026-09-06"
+              },
+              {
+                "weekNumber": 2,
+                "startDate": "2026-09-07",
+                "endDate": "2026-09-13"
+              }
+            ]
+          },
+          "dataSource": "teaching_system",
+          "sourceTimeZone": "Asia/Shanghai",
+          "periods": [
+            {
+              "period": 1,
+              "startTime": "08:00",
+              "endTime": "08:45"
+            },
+            {
+              "period": 2,
+              "startTime": "08:55",
+              "endTime": "09:40"
+            }
+          ],
+          "courses": [
+            {
+              "id": "teaching-class-id",
+              "courseCode": "COURSE001",
+              "courseName": "示例课程",
+              "teachingClass": "示例教学班",
+              "teacherNames": [
+                "教师甲"
+              ],
+              "credits": 2,
+              "category": "专业课",
+              "nature": "必修",
+              "assessmentMethod": "考试",
+              "examMethod": "闭卷",
+              "teachingClassComposition": [
+                "示例班级"
+              ],
+              "hours": {
+                "composition": "理论 32",
+                "weekly": 2,
+                "total": 32
+              },
+              "retake": false,
+              "selectionStatus": "selected",
+              "arrangements": [
+                {
+                  "id": "stable-arrangement-id",
+                  "weekday": 1,
+                  "weekdayLabel": "星期一",
+                  "periodStart": 3,
+                  "periodEnd": 4,
+                  "periods": [
+                    3,
+                    4
+                  ],
+                  "startTime": "10:00",
+                  "endTime": "11:40",
+                  "weekText": "1-3周(单),4-6周(双),7-12周",
+                  "weeks": [
+                    1,
+                    3,
+                    4,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11,
+                    12
+                  ],
+                  "activityType": "lecture",
+                  "activityTypeLabel": "讲课",
+                  "teacherNames": [
+                    "教师甲"
+                  ],
+                  "location": {
+                    "campus": "北碚校区",
+                    "building": "31教",
+                    "room": "31教101",
+                    "display": "31教101"
+                  },
+                  "teachingMethod": "线下",
+                  "selectionStatus": "selected",
+                  "adjusted": false
+                }
+              ]
+            }
+          ],
+          "additionalCourses": [
+            {
+              "id": "practice-id",
+              "type": "practice",
+              "description": "专业实践一周"
+            }
+          ],
+          "summary": {
+            "courseCount": 1,
+            "arrangementCount": 1,
+            "maxWeek": 16
+          }
+        },
+        "meta": {
+          "cached": true,
+          "fetchedAt": "2026-08-16T03:20:00.000Z",
+          "stale": false
+        }
+      }
+    },
+    "/teaching/schedule": {
+      "group": "课表与日程",
+      "summary": "读取本人在 Easy SWU 小程序中保存的日程。",
+      "notes": [
+        "未保存日程时 plans 为空数组。此接口只读，新增或修改日程请在小程序完成。"
+      ],
+      "related": [
+        "/teaching/timetable"
+      ],
+      "parameters": {},
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/ScheduleDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "plans": [
+            {
+              "id": "plan-example",
+              "title": "完成课程报告",
+              "date": "2026-09-14",
+              "startTime": "19:00",
+              "endDate": "2026-09-14",
+              "endTime": "20:30",
+              "done": false
+            }
+          ],
+          "clientUpdatedAt": "2026-09-11T08:00:00.000Z"
+        },
+        "meta": {
+          "cached": true,
+          "fetchedAt": "2026-09-11T08:00:00.000Z"
+        }
+      }
+    },
+    "/teaching/grades": {
+      "group": "成绩与统计",
+      "summary": "按学年、学期和关键词查询本人成绩，并返回完整筛选结果的汇总。",
+      "notes": [
+        "finalScore 和分项 score 可以是数字、文字或 null；不要直接 parseFloat。",
+        "summary 对全部筛选结果计算，不只是当前页。semesters 来自本人的真实成绩记录。",
+        "每条成绩保留独立 id；同名课程不应仅按课程名合并。"
+      ],
+      "related": [
+        "/teaching/grades/class-distribution",
+        "/teaching/pass-rates"
+      ],
+      "parameters": {
+        "page": {
+          "description": "从 1 开始，最多 100 页。",
+          "schema": {
+            "type": "integer",
+            "description": "页码",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 1
+          },
+          "example": 1
+        },
+        "pageSize": {
+          "description": "每页最多 100 条。",
+          "schema": {
+            "type": "integer",
+            "description": "每页条数",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "example": 50
+        },
+        "academicYear": {
+          "description": "学年起始年份，2000–2100；省略时查询全部学年。",
+          "schema": {
+            "type": "integer",
+            "description": "学年起始年份",
+            "minimum": 2000,
+            "maximum": 2100
+          },
+          "example": 2026
+        },
+        "term": {
+          "description": "省略时查询全部学期。",
+          "schema": {
+            "type": "integer",
+            "description": "学期",
+            "enum": [
+              1,
+              2,
+              3
+            ]
+          },
+          "example": 1
+        },
+        "q": {
+          "description": "搜索课程号、课程名、教师、成绩和备注等字段。",
+          "schema": {
+            "type": "string",
+            "description": "关键词",
+            "maxLength": 100
+          },
+          "example": "示例课程"
+        },
+        "sort": {
+          "description": "default 保留教务返回顺序。",
+          "schema": {
+            "type": "string",
+            "description": "排序字段",
+            "enum": [
+              "default",
+              "academicYear",
+              "courseName",
+              "finalScore"
+            ],
+            "default": "default"
+          },
+          "example": "default"
+        },
+        "order": {
+          "description": "排序方向。",
+          "schema": {
+            "type": "string",
+            "description": "方向",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "default": "desc"
+          },
+          "example": "desc"
+        },
+        "includeUnsuccessful": {
+          "description": "false 时排除未通过成绩与明确异常状态。",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          },
+          "example": true
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/GradesDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "items": [
+            {
+              "id": "teaching-class-001",
+              "academicYear": "2025-2026",
+              "term": 1,
+              "courseCode": "COURSE101",
+              "courseName": "示例课程",
+              "teachingClass": "示例课程-0001",
+              "teacherName": "张老师",
+              "department": "示例学院",
+              "courseNatureCode": "04",
+              "courseNature": "专业必修课",
+              "gradeNatureCode": "01",
+              "gradeNature": "正常考试",
+              "credits": 4,
+              "finalScore": "缓考",
+              "calculationScore": null,
+              "gradePoint": null,
+              "countsTowardGradePointAverage": true,
+              "gradeRemark": null,
+              "components": []
+            }
+          ],
+          "pagination": {
+            "page": 1,
+            "pageSize": 50,
+            "total": 1,
+            "totalPages": 1
+          },
+          "summary": {
+            "courseCount": 1,
+            "totalCredits": 4,
+            "weightedAverage": null,
+            "gradePointAverage": null
+          },
+          "semesters": [
+            {
+              "id": "2025-1",
+              "academicYear": 2025,
+              "academicYearLabel": "2025-2026",
+              "term": 1,
+              "label": "2025-2026 · 第一学期"
+            }
+          ]
+        },
+        "meta": {
+          "cached": true,
+          "fetchedAt": "2026-08-13T01:02:03.000Z"
+        }
+      }
+    },
+    "/teaching/grades/class-distribution": {
+      "group": "成绩与统计",
+      "summary": "查询本人某条成绩对应教学班的匿名分数计数。",
+      "notes": [
+        "courseId、academicYear、term 必须属于本人成绩单的同一条记录。",
+        "样本不足 10 人返回 status=insufficient、distribution=[]，这是成功响应。"
+      ],
+      "related": [
+        "/teaching/grades"
+      ],
+      "parameters": {
+        "courseId": {
+          "description": "使用成绩列表 items[].id。",
+          "schema": {
+            "type": "string",
+            "description": "成绩记录标识",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "example": "teaching-class-001"
+        },
+        "academicYear": {
+          "description": "所选成绩的学年起始年份，1900–2099。",
+          "schema": {
+            "type": "integer",
+            "description": "学年起始年份",
+            "minimum": 1900,
+            "maximum": 2099
+          },
+          "example": 2025
+        },
+        "term": {
+          "description": "所选成绩的学期。",
+          "schema": {
+            "type": "integer",
+            "description": "学期",
+            "enum": [
+              1,
+              2,
+              3
+            ]
+          },
+          "example": 1
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/ClassDistributionDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "status": "ready",
+          "distribution": [
+            {
+              "score": 76,
+              "count": 3
+            },
+            {
+              "score": 88,
+              "count": 7
+            }
+          ]
+        },
+        "meta": {
+          "cached": true,
+          "fetchedAt": "2026-08-13T01:02:03.000Z"
+        }
+      }
+    },
+    "/teaching/pass-rates": {
+      "group": "成绩与统计",
+      "summary": "获取本人已修或课表课程的匿名通过率统计及可选课程。",
+      "notes": [
+        "首次可以不传参数，随后将 courses[].statisticsKey 作为 courseKey。",
+        "从课表进入时，同时传 semester 和 timetableCourseId；两者必须对应本人的课程。",
+        "status=collecting 或 statistics=null 表示暂无可用统计。percentageOnly=true 时仅展示百分比。"
+      ],
+      "related": [
+        "/teaching/grades",
+        "/teaching/timetable"
+      ],
+      "parameters": {
+        "courseKey": {
+          "description": "原样使用本接口 courses[].statisticsKey。",
+          "schema": {
+            "type": "string",
+            "description": "64 位小写十六进制键",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "semester": {
+          "description": "与 timetableCourseId 成对提供，使用所选课表学期。",
+          "schema": {
+            "type": "string",
+            "description": "学期",
+            "pattern": "^(?:19|20)\\d{2}-[123]$"
+          },
+          "example": "2026-1"
+        },
+        "timetableCourseId": {
+          "description": "与 semester 成对提供，使用课表 courses[].id。",
+          "schema": {
+            "type": "string",
+            "description": "课表课程标识",
+            "maxLength": 255
+          },
+          "example": "teaching-class-id"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/PassRatesDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "courses": [],
+          "selectedCourse": null,
+          "percentageOnly": false,
+          "status": "collecting",
+          "message": "暂无可用统计",
+          "statistics": null
+        },
+        "meta": {
+          "cached": true
+        }
+      }
+    },
+    "/teaching/exams": {
+      "group": "考试安排",
+      "summary": "按学期查询本人的正常考试、补考与缓考安排。",
+      "notes": [
+        "semester 使用考试学期接口返回的 semesters[].id。",
+        "startAt/endAt 带时区；学校未给出确切时间时可能为 null，此时保留 raw 文本。"
+      ],
+      "related": [
+        "/teaching/exams/options"
+      ],
+      "parameters": {
+        "page": {
+          "description": "从 1 开始，最多 100 页。",
+          "schema": {
+            "type": "integer",
+            "description": "页码",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 1
+          },
+          "example": 1
+        },
+        "pageSize": {
+          "description": "每页最多 100 条。",
+          "schema": {
+            "type": "integer",
+            "description": "每页条数",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "example": 50
+        },
+        "semester": {
+          "description": "先从本接口或学期选项接口获取 id；不要按日期推算。省略时采用默认学期。",
+          "schema": {
+            "type": "string",
+            "description": "学期标识",
+            "pattern": "^\\d{4}-[123]$"
+          },
+          "example": "2026-1"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/ExamsDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "items": [
+            {
+              "id": "exam-001",
+              "academicYear": "2025-2026",
+              "term": 2,
+              "arrangementType": "makeup_deferred",
+              "arrangementTypeLabel": "补/缓考",
+              "examName": "2025-2026-2补缓考名单",
+              "course": {
+                "code": "COURSE101",
+                "name": "示例课程",
+                "credits": 4
+              },
+              "time": {
+                "date": "2026-03-07",
+                "startTime": "09:00",
+                "endTime": "11:00",
+                "startAt": "2026-03-07T09:00:00+08:00",
+                "endAt": "2026-03-07T11:00:00+08:00",
+                "raw": "2026-03-07(09:00-11:00)"
+              },
+              "location": {
+                "room": "示例考场101",
+                "campus": "北碚校区"
+              },
+              "method": "闭卷",
+              "retake": false,
+              "teachingClass": "示例课程-0001",
+              "department": "示例学院",
+              "teacherNames": [
+                "教师甲",
+                "教师乙"
+              ],
+              "note": "请携带学生证"
+            }
+          ],
+          "pagination": {
+            "page": 1,
+            "pageSize": 50,
+            "total": 1,
+            "totalPages": 1
+          },
+          "semester": {
+            "id": "2025-2",
+            "academicYear": 2025,
+            "academicYearLabel": "2025-2026",
+            "term": 2,
+            "label": "2025-2026 · 第二学期"
+          },
+          "semesters": [
+            {
+              "id": "2025-2",
+              "academicYear": 2025,
+              "academicYearLabel": "2025-2026",
+              "term": 2,
+              "label": "2025-2026 · 第二学期"
+            }
+          ],
+          "summary": {
+            "total": 1,
+            "regular": 0,
+            "makeup": 0,
+            "deferred": 0,
+            "makeupDeferred": 1
+          }
+        },
+        "meta": {
+          "cached": false
+        }
+      }
+    },
+    "/teaching/exams/options": {
+      "group": "考试安排",
+      "summary": "获取本人可查询的考试学期与默认学期。",
+      "notes": [
+        "无可用学期时 semesters=[]、defaultSemester=null。"
+      ],
+      "related": [
+        "/teaching/exams"
+      ],
+      "parameters": {},
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/ExamOptionsDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "semesters": [
+            {
+              "id": "2025-2",
+              "academicYear": 2025,
+              "academicYearLabel": "2025-2026",
+              "term": 2,
+              "label": "2025-2026 · 第二学期"
+            },
+            {
+              "id": "2025-1",
+              "academicYear": 2025,
+              "academicYearLabel": "2025-2026",
+              "term": 1,
+              "label": "2025-2026 · 第一学期"
+            }
+          ],
+          "defaultSemester": {
+            "id": "2025-2",
+            "academicYear": 2025,
+            "academicYearLabel": "2025-2026",
+            "term": 2,
+            "label": "2025-2026 · 第二学期"
+          }
+        },
+        "meta": {
+          "cached": false
+        }
+      }
+    },
+    "/teaching/messages": {
+      "group": "消息与通知",
+      "summary": "读取本人的调课、补课、停课等校园消息。",
+      "notes": [
+        "当前提供最近 15 条消息；分页不代表可以读取完整历史。",
+        "先判断 type 和 parsed，再读取 originalSchedule、newSchedule 或 schedule；other 类型读取 content。"
+      ],
+      "related": [],
+      "parameters": {
+        "page": {
+          "description": "从 1 开始，最多 100 页。",
+          "schema": {
+            "type": "integer",
+            "description": "页码",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 1
+          },
+          "example": 1
+        },
+        "pageSize": {
+          "description": "每页最多 100 条。",
+          "schema": {
+            "type": "integer",
+            "description": "每页条数",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          },
+          "example": 20
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/MessagesDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "items": [
+            {
+              "id": "message-001",
+              "createdAt": "2026-08-13 10:20:30",
+              "type": "course_rescheduled",
+              "title": "调课提醒",
+              "courseName": "示例课程",
+              "teacherName": "教师甲",
+              "originalSchedule": {
+                "weekStart": 2,
+                "weekEnd": 2,
+                "weeks": [
+                  2
+                ],
+                "weekday": 3,
+                "periodStart": 1,
+                "periodEnd": 2,
+                "location": "示例教室A"
+              },
+              "newTeacherName": "教师乙",
+              "newSchedule": {
+                "weekStart": 3,
+                "weekEnd": 3,
+                "weeks": [
+                  3
+                ],
+                "weekday": 4,
+                "periodStart": 3,
+                "periodEnd": 4,
+                "location": "示例教室B"
+              },
+              "parsed": true
+            }
+          ],
+          "pagination": {
+            "page": 1,
+            "pageSize": 20,
+            "total": 1,
+            "totalPages": 1
+          }
+        },
+        "meta": {
+          "cached": true,
+          "fetchedAt": "2026-08-13T10:20:30.000Z",
+          "refreshing": true
+        }
+      }
+    },
+    "/teaching/notices": {
+      "group": "消息与通知",
+      "summary": "分页查询对学生可见的学校通知，并支持标题搜索。",
+      "notes": [
+        "当前提供最多 50 条可见通知；使用返回的 id 读取详情。"
+      ],
+      "related": [
+        "/teaching/notices/detail"
+      ],
+      "parameters": {
+        "page": {
+          "description": "从 1 开始，最多 100 页。",
+          "schema": {
+            "type": "integer",
+            "description": "页码",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 1
+          },
+          "example": 1
+        },
+        "pageSize": {
+          "description": "每页最多 100 条。",
+          "schema": {
+            "type": "integer",
+            "description": "每页条数",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          },
+          "example": 20
+        },
+        "q": {
+          "description": "按标题搜索。",
+          "schema": {
+            "type": "string",
+            "description": "关键词",
+            "maxLength": 100
+          },
+          "example": "选课"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/NoticesDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "items": [
+            {
+              "id": "ugs:1012:4521",
+              "title": "关于2026-2027学年度第一学期专业选修课选课的通知",
+              "link": "https://ugs.swu.edu.cn/info/1012/4521.htm",
+              "publishedAt": "2026-08-27",
+              "semesterId": "2026-1"
+            }
+          ],
+          "pagination": {
+            "page": 1,
+            "pageSize": 20,
+            "total": 1,
+            "totalPages": 1
+          }
+        },
+        "meta": {
+          "cached": false
+        }
+      }
+    },
+    "/teaching/notices/detail": {
+      "group": "消息与通知",
+      "summary": "读取学校通知的正文、结构化段落与附件信息。",
+      "notes": [
+        "id 必须来自当前可见的通知列表；已经不可见的通知返回 NOTICE_NOT_VISIBLE。",
+        "正文中 type=attachment 的片段提供 url 和 name；通过附件接口下载，不能传入任意外部 URL。"
+      ],
+      "related": [
+        "/teaching/notices",
+        "/teaching/notices/attachment"
+      ],
+      "parameters": {
+        "id": {
+          "description": "使用通知列表 items[].id。",
+          "schema": {
+            "type": "string",
+            "description": "通知标识",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "example": "ugs:1012:4521"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/NoticeDetailDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "id": "ugs:1012:4521",
+          "title": "关于示例事项的通知",
+          "publisher": "本科生院",
+          "publishedAt": "2026-03-12 09:51:09",
+          "contentHtml": "<h2>一、办理时间</h2><div data-easy-swu-list=\"true\"><div>1． 第一轮次</div></div>",
+          "contentBlocks": [
+            {
+              "key": "html-0",
+              "type": "html",
+              "contentHtml": "<h2>一、办理时间</h2>"
+            },
+            {
+              "key": "list-1",
+              "type": "list",
+              "markerWidthEm": 1.58,
+              "items": [
+                {
+                  "key": "list-1-0",
+                  "marker": "1．",
+                  "contentHtml": "第一轮次"
+                }
+              ]
+            }
+          ],
+          "link": "https://ugs.swu.edu.cn/info/1012/4521.htm"
+        },
+        "meta": {
+          "cached": true,
+          "fetchedAt": "2026-08-14T06:30:00.000Z",
+          "refreshing": true
+        }
+      }
+    },
+    "/teaching/notices/attachment": {
+      "group": "消息与通知",
+      "summary": "下载可见通知正文中列出的附件。成功时返回文件字节。",
+      "notes": [
+        "id 使用通知标识，url 使用该通知正文中的附件 URL，并进行 URL 编码。",
+        "文件最多 16 MiB。非图片附件通常返回 application/octet-stream，不保证返回原文件名；用正文的 name 命名下载文件。",
+        "仅支持通知正文中的允许链接，不提供通用 URL 代理。"
+      ],
+      "related": [
+        "/teaching/notices/detail"
+      ],
+      "parameters": {
+        "id": {
+          "description": "使用通知列表或正文的 id。",
+          "schema": {
+            "type": "string",
+            "description": "通知标识",
+            "maxLength": 512
+          },
+          "example": "ugs:1012:4521"
+        },
+        "url": {
+          "description": "原样使用正文附件片段的 url；使用 URLSearchParams 编码。",
+          "schema": {
+            "type": "string",
+            "description": "HTTPS 附件地址",
+            "maxLength": 1024
+          },
+          "example": "https://ugs.swu.edu.cn/example.pdf"
+        }
+      },
+      "content_type": "application/octet-stream",
+      "response_schema": {
+        "type": "string",
+        "format": "binary"
+      },
+      "response_example": null
+    },
+    "/teaching/rooms/options": {
+      "group": "空教室",
+      "summary": "获取校区、楼栋、节次及当前可查询的日期范围。",
+      "notes": [
+        "首次不传 campusId 可获取所有校区和 buildingsByCampus。",
+        "查询参数必须从本接口选项中选择；日期位于 minDate 和 maxDate 之间，不要硬编码校区、楼栋或节次。"
+      ],
+      "related": [
+        "/teaching/rooms"
+      ],
+      "parameters": {
+        "campusId": {
+          "description": "省略时返回各校区楼栋；传入后 buildings 仅包含该校区。",
+          "schema": {
+            "type": "string",
+            "description": "校区编码",
+            "maxLength": 64
+          },
+          "example": "campus-a"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/RoomOptionsDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "minDate": "2026-08-13",
+          "maxDate": "2027-08-13",
+          "campuses": [
+            {
+              "value": "campus-a",
+              "label": "北碚校区（南）"
+            }
+          ],
+          "buildings": [],
+          "buildingsByCampus": {
+            "campus-a": [
+              {
+                "value": "building-30",
+                "label": "30教"
+              }
+            ]
+          },
+          "periods": [
+            {
+              "period": 1,
+              "startTime": "08:00",
+              "endTime": "08:45"
+            },
+            {
+              "period": 2,
+              "startTime": "08:55",
+              "endTime": "09:40"
+            }
+          ],
+          "periodGroups": [
+            {
+              "id": "morning",
+              "label": "上午",
+              "periods": [
+                1,
+                2,
+                3,
+                4
+              ]
+            }
+          ],
+          "source": {
+            "name": "学校教务管理系统",
+            "updatedAt": "2026-08-13T06:08:54.000Z"
+          }
+        },
+        "meta": {
+          "cached": true,
+          "fetchedAt": "2026-08-13T06:08:54.000Z"
+        }
+      }
+    },
+    "/teaching/rooms": {
+      "group": "空教室",
+      "summary": "查询指定日期、校区、楼栋和节次内可用的教室。",
+      "notes": [
+        "先请求空教室选项。date、periods、campusId、buildingIds 均为必填。",
+        "buildingIds 最多 5 个，用英文逗号分隔；返回 query 中包含规范化条件。",
+        "本接口有独立冷却；遇到 429 遵循 Retry-After，避免循环立即重试。"
+      ],
+      "related": [
+        "/teaching/rooms/options"
+      ],
+      "parameters": {
+        "page": {
+          "description": "从 1 开始，最多 100 页。",
+          "schema": {
+            "type": "integer",
+            "description": "页码",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 1
+          },
+          "example": 1
+        },
+        "pageSize": {
+          "description": "每页最多 100 条。",
+          "schema": {
+            "type": "integer",
+            "description": "每页条数",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 30
+          },
+          "example": 30
+        },
+        "date": {
+          "description": "使用选项接口 minDate 至 maxDate 范围内的日期，学校时区为 Asia/Shanghai。",
+          "schema": {
+            "type": "string",
+            "description": "日期",
+            "format": "date"
+          },
+          "example": "2026-09-14"
+        },
+        "periods": {
+          "description": "从选项 periods[].period 选择，用英文逗号分隔；每项 1–30。",
+          "schema": {
+            "type": "string",
+            "description": "节次列表"
+          },
+          "example": "1,2"
+        },
+        "campusId": {
+          "description": "使用 campuses[].value。",
+          "schema": {
+            "type": "string",
+            "description": "校区编码",
+            "maxLength": 64
+          },
+          "example": "campus-a"
+        },
+        "buildingIds": {
+          "description": "使用该校区楼栋的 value，最多 5 个，用英文逗号分隔，每个编码最长 64 字符。",
+          "schema": {
+            "type": "string",
+            "description": "楼栋列表",
+            "maxLength": 1024
+          },
+          "example": "building-30"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/RoomsDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "items": [
+            {
+              "id": "room-301",
+              "code": "room-301",
+              "name": "301",
+              "campus": {
+                "id": "campus-a",
+                "name": "北碚校区（南）"
+              },
+              "building": {
+                "id": "building-30",
+                "name": "30教"
+              },
+              "floor": "3",
+              "type": "普通教室",
+              "capacity": 80
+            }
+          ],
+          "pagination": {
+            "page": 1,
+            "pageSize": 30,
+            "total": 1,
+            "totalPages": 1
+          },
+          "query": {
+            "date": "2026-08-13",
+            "periods": [
+              5,
+              6
+            ],
+            "campusId": "campus-a",
+            "buildingIds": [
+              "building-30",
+              "building-31"
+            ]
+          },
+          "dataUpdatedAt": "2026-08-13 06:08:54",
+          "summary": {
+            "totalRooms": 1,
+            "buildings": [
+              {
+                "id": "building-30",
+                "name": "30教",
+                "roomCount": 1
+              }
+            ]
+          }
+        },
+        "meta": {
+          "cached": false
+        }
+      }
+    },
+    "/utilities/electricity/account": {
+      "group": "寝室电费",
+      "summary": "读取本人已绑定寝室的最近电费余额与用电记录。",
+      "notes": [
+        "未绑定时 binding 和 account 为 null；先在 Easy SWU 小程序绑定寝室。",
+        "此接口不会绑定寝室或主动查询最新电费。用 accountFetchedAt 显示账单的实际更新时间。",
+        "金额单位为元，用电量单位为 kWh；电补助为 null 与数值 0 含义不同。"
+      ],
+      "related": [
+        "/utilities/electricity/buildings"
+      ],
+      "parameters": {},
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/ElectricityDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "binding": {
+            "buildingId": "100121",
+            "buildingName": "楠园1舍",
+            "roomNumber": "0305",
+            "boundAt": "2026-07-12T08:30:00.000Z",
+            "changedAt": "2026-08-17T11:20:00.000Z"
+          },
+          "account": {
+            "billedElectricityKwh": 174.49,
+            "electricityFeeYuan": 90.75,
+            "remainingAmountYuan": 18.52,
+            "availableElectricitySubsidyKwh": 119.29,
+            "lastPaymentDate": "2026-07-22",
+            "lastSettlementDate": "2026-08-14",
+            "dailyElectricityFees": [
+              {
+                "date": "2026-08-12",
+                "amountYuan": 2.1
+              },
+              {
+                "date": "2026-08-13",
+                "amountYuan": 1.95
+              },
+              {
+                "date": "2026-08-14",
+                "amountYuan": 2.7
+              }
+            ]
+          },
+          "accountFetchedAt": "2026-08-17T11:20:00.000Z"
+        },
+        "meta": {
+          "cached": false,
+          "fetchedAt": "2026-08-17T11:20:00.000Z"
+        }
+      }
+    },
+    "/utilities/electricity/buildings": {
+      "group": "寝室电费",
+      "summary": "读取校园能源系统的宿舍楼编码与名称。",
+      "notes": [
+        "楼栋列表仅用于识别已有寝室，开放平台暂不提供寝室绑定接口。"
+      ],
+      "related": [
+        "/utilities/electricity/account"
+      ],
+      "parameters": {},
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/ElectricityBuildingsDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "buildings": [
+            {
+              "id": "100121",
+              "name": "楠园1舍"
+            },
+            {
+              "id": "100122",
+              "name": "楠园2舍"
+            }
+          ]
+        }
+      }
+    },
+    "/content/feed": {
+      "group": "校园公告",
+      "summary": "读取 Easy SWU 校园应用中对本人可见的公告与通知。",
+      "notes": [
+        "这组内容来自校园应用；开放平台自身的运营公告在首页和控制台展示。",
+        "当前版本只提供读取，不提供标记已读、记录弹窗或 content/media 下载。media[].url 不能直接换成开放平台地址调用。"
+      ],
+      "related": [],
+      "parameters": {},
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/FeedDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "items": [],
+          "announcements": [],
+          "notifications": [],
+          "unreadCount": 0
+        }
+      }
+    }
+  }
+}
