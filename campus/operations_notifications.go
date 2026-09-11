@@ -414,6 +414,9 @@ func (a *App) operationsWorker(ctx context.Context) {
 			}
 			a.deliverNotifications(work)
 			a.retryRevokedSessions(work)
+			if work.Err() == nil {
+				a.monitorWorkerAt.Store(time.Now().Unix())
+			}
 		}()
 	}
 }

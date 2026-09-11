@@ -1,5 +1,9 @@
 # Lazy Campus 开放平台
 
+可选监控：设置独立 `STATUS_MONITOR_TOKEN` 后，可用 Bearer 凭据读取 `/internal/monitoring/v1/state`。报告区分应用权限/限流依赖、近 5 分钟校园调用、邮件队列及工作循环；只读且不消耗开发者额度。未配置密钥时此入口返回 404，平台不依赖 Status Page 运行。近期请求不足时不以单次用户错误判断全站故障。
+
+校园调用组件独立检查本地依赖与校园后端 `/api/v1/system/ready`，不携带用户身份、不发起业务查询。`healthStatus` 与流量状态独立，零请求时保留健康结果，成功率及 P95 留空。统计查询失败或超过 20,000 行上限时省略统计，不把不完整结果显示为零调用。
+
 <p align="center"><img src="logo.webp" alt="Lazy Campus" width="144"></p>
 
 Logo 使用质量 0.9 的 WebP，保留原始尺寸；浏览器圆形图标使用 96px WebP 嵌入 SVG，仓库不保留 PNG 副本。

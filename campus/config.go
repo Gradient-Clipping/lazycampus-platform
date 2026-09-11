@@ -12,11 +12,13 @@ type Config struct {
 	CampusURL, CampusSecret, Revision, StaticDir                           string
 	SenderAPIKey, SenderFrom, SenderName                                   string
 	SecureCookies                                                          bool
+	StatusMonitorToken                                                     string
 }
 
 func LoadConfig() (Config, error) {
 	c := Config{
-		Address: env("LISTEN_ADDR", ":3000"), Origin: env("PLATFORM_ORIGIN", "https://platform.lazycampus.com"),
+		StatusMonitorToken: os.Getenv("STATUS_MONITOR_TOKEN"),
+		Address:            env("LISTEN_ADDR", ":3000"), Origin: env("PLATFORM_ORIGIN", "https://platform.lazycampus.com"),
 		Issuer:   env("OIDC_ISSUER", "https://auth.lazycampus.com/realms/lazycampus"),
 		ClientID: env("OIDC_CLIENT_ID", "lazycampus-platform"), ClientSecret: os.Getenv("OIDC_CLIENT_SECRET"),
 		RedisURL: os.Getenv("REDIS_URL"), DatabaseDSN: os.Getenv("DATABASE_DSN"),

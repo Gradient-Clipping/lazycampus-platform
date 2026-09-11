@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -23,13 +24,14 @@ import (
 )
 
 type App struct {
-	Config   Config
-	DB       *gorm.DB
-	Redis    *redis.Client
-	HTTP     *http.Client
-	Provider *oidc.Provider
-	OAuth    oauth2.Config
-	cancel   context.CancelFunc
+	Config          Config
+	DB              *gorm.DB
+	Redis           *redis.Client
+	HTTP            *http.Client
+	Provider        *oidc.Provider
+	OAuth           oauth2.Config
+	cancel          context.CancelFunc
+	monitorWorkerAt atomic.Int64
 }
 
 func New(ctx context.Context, config Config) (*App, error) {
@@ -105,6 +107,7 @@ func (a *App) Router() *gin.Engine {
 	})
 	r.GET("/healthz", func(c *gin.Context) { c.JSON(200, gin.H{"status": "ok", "revision": a.Config.Revision}) })
 	r.GET("/readyz", a.ready)
+	r.GET("/internal/monitoring/v1/state", a.monitoringState)
 	r.GET("/auth/start", a.login)
 	r.GET("/auth/callback", a.callback)
 	r.POST("/auth/backchannel-logout", a.backchannelLogout)
