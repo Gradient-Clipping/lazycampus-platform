@@ -128,6 +128,18 @@
 }
 .platform-footer {
   margin: 0 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+.service-status-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.service-status-link svg {
+  flex: none;
 }
 .user-avatar {
   background: #6fc555;

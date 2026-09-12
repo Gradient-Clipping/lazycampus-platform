@@ -7,6 +7,7 @@ import { translate, useLocale, dateLocale } from '@/i18n/translate'
 import { useSite, statusLabels } from './operations-data'
 import { RefreshButton } from './operations-shared'
 import { ErrorState, Loading } from './shared'
+import { StatusPageLink } from './status-page-link'
 
 export function SiteHelp() {
   useLocale()
@@ -25,6 +26,7 @@ export function SiteHelp() {
           {translate(statusLabels[s.service_status])}
           <span>{translate('查看接口状态 →')}</span>
         </Link>
+        <StatusPageLink />
         {s.help_url && <a href={s.help_url}>{translate('帮助文档 ↗')}</a>}
         {s.support_email && (
           <a href={`mailto:${s.support_email}`}>{s.support_email}</a>
@@ -56,6 +58,7 @@ export function ServiceStatusPage() {
         <h1>{translate('服务状态')}</h1>
       </div>
       <div className='ops-actions'>
+        <StatusPageLink />
         <RefreshButton
           pending={data.isFetching}
           onClick={() => void data.refetch()}

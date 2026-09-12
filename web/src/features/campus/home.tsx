@@ -25,6 +25,7 @@ import { CodeBlock } from './code-block'
 import { useSite } from './operations-data'
 import { scopeName } from './permissions'
 import { SiteHelp } from './site-content'
+import { StatusPageLink } from './status-page-link'
 
 const demos = [
   {
@@ -328,6 +329,7 @@ export function Home() {
           <span>
             © {new Date().getFullYear()} {site.data?.site.name || 'Lazy Campus'}
           </span>
+          <StatusPageLink />
           <a
             href='https://github.com/Gradient-Clipping/lazycampus-platform'
             target='_blank'

@@ -52,6 +52,7 @@ import { Logs } from './request-logs'
 import { SessionContext } from './session'
 import { ErrorState, Loading } from './shared'
 import { ServiceStatusPage } from './site-content'
+import { StatusPageLink } from './status-page-link'
 import type { User } from './types'
 
 const navigation = [
@@ -522,6 +523,7 @@ function PlatformLayout(props: {
               <span>
                 {site.data?.site.name || 'Lazy Campus'} · {t('Open platform')}
               </span>
+              <StatusPageLink />
               <a
                 href='https://github.com/QuantumNous/new-api'
                 target='_blank'
