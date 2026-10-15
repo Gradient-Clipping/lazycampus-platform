@@ -48,7 +48,7 @@ func AuthorizedIdentity(claims Claims) (User, error) {
 		return User{}, errors.New("missing identity")
 	}
 	role := "user"
-	if claims.Username == "ystemsrx" && slices.Contains(claims.RealmAccess.Roles, "platform-admin") {
+	if claims.Username == "ystemsr" && slices.Contains(claims.RealmAccess.Roles, "platform-admin") {
 		role = "admin"
 	} else if !identityID.MatchString(claims.IdentityID) || claims.StudentNumber == "" {
 		return User{}, errors.New("school identity required")

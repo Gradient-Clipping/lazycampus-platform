@@ -36,7 +36,7 @@ func TestSchoolAndAdministratorAllowlist(t *testing.T) {
 		{"ordinary local account", Claims{Subject: "local", Username: "visitor"}, false, ""},
 		{"forged school attribute", Claims{Subject: "local", IdentityID: "some-account", StudentNumber: "123"}, false, ""},
 		{"school", Claims{Subject: "campus", IdentityID: "11111111-2222-4333-8444-555555555555", StudentNumber: "20260001"}, true, "user"},
-		{"admin without role", Claims{Subject: "admin", Username: "ystemsrx"}, false, ""},
+		{"admin without role", Claims{Subject: "admin", Username: "ystemsr"}, false, ""},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			u, err := AuthorizedIdentity(tc.claims)
@@ -50,12 +50,12 @@ func TestSchoolAndAdministratorAllowlist(t *testing.T) {
 			}
 		})
 	}
-	admin := Claims{Subject: "admin", Username: "ystemsrx"}
+	admin := Claims{Subject: "admin", Username: "ystemsr"}
 	admin.RealmAccess.Roles = []string{"platform-admin"}
 	u, err := AuthorizedIdentity(admin)
 	require.NoError(t, err)
 	assert.Equal(t, "admin", u.Role)
-	admin.Username = "another-admin"
+	admin.Username = "ystemsrx"
 	_, err = AuthorizedIdentity(admin)
 	assert.Error(t, err)
 }
