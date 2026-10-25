@@ -15,6 +15,7 @@ import {
   within,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { toast } from 'sonner'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 import i18n from '@/i18n/config'
@@ -204,7 +205,62 @@ beforeEach(async () => {
 afterEach(() => {
   cleanup()
   vi.unstubAllGlobals()
+  vi.restoreAllMocks()
   vi.clearAllMocks()
+})
+
+it('downloads a verified JSON contract beside the document title and rejects HTML', async () => {
+  const user = userEvent.setup()
+  view('start')
+  const heading = await screen.findByRole('heading', {
+    name: '把校园数据接入你的应用',
+  })
+  const row = heading.parentElement
+  if (!row) throw new Error('Missing title row')
+  const button = within(row).getByRole('button', { name: '下载 OpenAPI' })
+  const create = vi.fn().mockReturnValue('blob:openapi-test')
+  vi.stubGlobal(
+    'URL',
+    class extends URL {
+      static createObjectURL = create
+      static revokeObjectURL = vi.fn()
+    }
+  )
+  const click = vi
+    .spyOn(HTMLAnchorElement.prototype, 'click')
+    .mockImplementation(() => {})
+  const error = vi.spyOn(toast, 'error').mockReturnValue('openapi-error')
+  const fetch = vi.fn().mockResolvedValue(
+    new Response(JSON.stringify({ openapi: '3.0.3', paths: {} }), {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  )
+  vi.stubGlobal('fetch', fetch)
+  await user.click(button)
+  await waitFor(() => expect(click).toHaveBeenCalledTimes(1))
+  expect(fetch).toHaveBeenCalledWith(
+    '/openapi.json?lang=zh&download=1',
+    expect.objectContaining({
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    })
+  )
+  expect(create.mock.calls[0][0].type).toBe('application/json;charset=utf-8')
+  expect(click.mock.instances[0]).toHaveProperty(
+    'download',
+    'lazycampus-openapi.json'
+  )
+  expect(
+    screen.queryByRole('heading', { name: '接口文档' })
+  ).not.toBeInTheDocument()
+  fetch.mockResolvedValue(
+    new Response('<html>not a contract</html>', {
+      headers: { 'Content-Type': 'text/html' },
+    })
+  )
+  await user.click(button)
+  await waitFor(() => expect(error).toHaveBeenCalledTimes(1))
+  expect(create).toHaveBeenCalledTimes(1)
 })
 function view(hash = 'start') {
   const root = createRootRoute()

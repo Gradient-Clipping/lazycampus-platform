@@ -34,7 +34,8 @@ import {
   schemaType,
 } from './reference-data'
 import { ReferenceGuide } from './reference-guide'
-import { ErrorState, Loading, PageHeading } from './shared'
+import { ReferenceHeading } from './reference-heading'
+import { ErrorState, Loading } from './shared'
 import type { Endpoint, ReferenceSchema } from './types'
 
 export function ApiReference() {
@@ -75,160 +76,137 @@ export function ApiReference() {
     ),
   ]
   return (
-    <>
-      <PageHeading
-        title={translate('接口文档')}
-        description={translate('接入指南、接口契约与在线调试。')}
-        action={
-          <Button
-            variant='outline'
-            render={
-              <a
-                href={`/openapi.json?lang=${currentLanguage()}`}
-                download='lazycampus-openapi.json'
-              />
-            }
-          >
-            <ArrowDownToLine size={16} />
-            {translate('下载 OpenAPI')}
-          </Button>
-        }
-      />
-      <div className='reference-layout reference-v2 reference-v3'>
-        <aside className='api-list'>
-          <div className='search-field'>
-            <Search size={16} />
-            <Input
-              aria-label={translate('搜索接口')}
-              placeholder={translate('搜索名称、路径或权限')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            {search && (
-              <button
-                type='button'
-                className='reference-clear'
-                onClick={() => setSearch('')}
-              >
-                {translate('清除')}
-              </button>
-            )}
-          </div>
-          <nav className='api-list-scroll' aria-label={translate('文档目录')}>
-            <p className='nav-caption reference-nav-title'>
-              {translate('接入指南')}
-            </p>
-            {referenceGuides.map((g) => (
-              <Link
-                key={g.id}
-                to='/api-reference'
-                activeOptions={{ includeHash: true }}
-                hash={g.id}
-                aria-current={!active && g.id === guide ? 'page' : undefined}
-                className={`api-item nav-item reference-guide-item${!active && g.id === guide ? ' selected active' : ''}`}
-              >
-                <BookOpen size={17} aria-hidden='true' />
-                <span>{translate(g.title)}</span>
-              </Link>
-            ))}
-            <div className='reference-nav-divider' />
-            <div className='reference-directory-heading'>
-              <span>{translate('接口目录')}</span>
-              <span aria-live='polite'>
-                {endpoints.length} / {localized.length}
-              </span>
-            </div>
-            {groups.map((group) => (
-              <details key={group} className='reference-nav-group' open>
-                <summary className='nav-caption'>
-                  <ChevronRight
-                    className='reference-disclosure-icon'
-                    size={14}
-                    aria-hidden='true'
-                  />
-                  {group}
-                  <span>
-                    {
-                      endpoints.filter((e) => e.documentation?.group === group)
-                        .length
-                    }
-                  </span>
-                </summary>
-                {endpoints
-                  .filter(
-                    (e) =>
-                      (e.documentation?.group || translate('接口目录')) ===
-                      group
-                  )
-                  .map((e) => (
-                    <Link
-                      key={e.path}
-                      to='/api-reference'
-                      activeOptions={{ includeHash: true }}
-                      hash={`api${e.path}`}
-                      className={`api-item nav-item${e.path === active?.path ? ' selected active' : ''}`}
-                      title={`${e.method || 'GET'} /v1${e.path}`}
-                      aria-current={
-                        e.path === active?.path ? 'page' : undefined
-                      }
-                    >
-                      <FileText size={17} aria-hidden='true' />
-                      <span>{e.name}</span>
-                    </Link>
-                  ))}
-              </details>
-            ))}
-            {!endpoints.length && (
-              <p className='reference-empty' role='status'>
-                {translate('没有匹配的接口，请尝试其他关键词。')}
-              </p>
-            )}
-          </nav>
-          <Link to='/status' className='reference-status-link'>
-            {translate('查看接口状态 ')}
-            <ArrowRight size={14} />
-          </Link>
-        </aside>
-        <article
-          className='api-document'
-          aria-label={
-            active?.name ||
-            translate(referenceGuides.find((g) => g.id === guide)?.title || '')
-          }
-        >
-          {hash && !active && !referenceGuides.some((g) => g.id === hash) && (
-            <p className='reference-callout'>
-              {translate('未找到此文档条目，请从目录选择接口。')}
-            </p>
-          )}
-          {active ? (
-            <EndpointReference
-              key={active.path}
-              endpoint={active}
-              endpoints={localized}
-            />
-          ) : (
-            <ReferenceGuide
-              id={guide}
-              quickstartScope={
-                catalog.data.find((e) => e.path === '/content/feed')?.scope ||
-                'content:read'
-              }
-            />
-          )}
-          <footer className='reference-footer'>
-            <BookOpen size={15} />
-            <span>{translate('API v1 · 校园服务接口')}</span>
-            <a
-              href={`/openapi.json?lang=${currentLanguage()}`}
-              download='lazycampus-openapi.json'
+    <div className='reference-layout reference-v2 reference-v3'>
+      <aside className='api-list'>
+        <div className='search-field'>
+          <Search size={16} />
+          <Input
+            aria-label={translate('搜索接口')}
+            placeholder={translate('搜索名称、路径或权限')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && (
+            <button
+              type='button'
+              className='reference-clear'
+              onClick={() => setSearch('')}
             >
-              OpenAPI 3.0.3 <ArrowDownToLine size={13} />
-            </a>
-          </footer>
-        </article>
-      </div>
-    </>
+              {translate('清除')}
+            </button>
+          )}
+        </div>
+        <nav className='api-list-scroll' aria-label={translate('文档目录')}>
+          <p className='nav-caption reference-nav-title'>
+            {translate('接入指南')}
+          </p>
+          {referenceGuides.map((g) => (
+            <Link
+              key={g.id}
+              to='/api-reference'
+              activeOptions={{ includeHash: true }}
+              hash={g.id}
+              aria-current={!active && g.id === guide ? 'page' : undefined}
+              className={`api-item nav-item reference-guide-item${!active && g.id === guide ? ' selected active' : ''}`}
+            >
+              <BookOpen size={17} aria-hidden='true' />
+              <span>{translate(g.title)}</span>
+            </Link>
+          ))}
+          <div className='reference-nav-divider' />
+          <div className='reference-directory-heading'>
+            <span>{translate('接口目录')}</span>
+            <span aria-live='polite'>
+              {endpoints.length} / {localized.length}
+            </span>
+          </div>
+          {groups.map((group) => (
+            <details key={group} className='reference-nav-group' open>
+              <summary className='nav-caption'>
+                <ChevronRight
+                  className='reference-disclosure-icon'
+                  size={14}
+                  aria-hidden='true'
+                />
+                {group}
+                <span>
+                  {
+                    endpoints.filter((e) => e.documentation?.group === group)
+                      .length
+                  }
+                </span>
+              </summary>
+              {endpoints
+                .filter(
+                  (e) =>
+                    (e.documentation?.group || translate('接口目录')) === group
+                )
+                .map((e) => (
+                  <Link
+                    key={e.path}
+                    to='/api-reference'
+                    activeOptions={{ includeHash: true }}
+                    hash={`api${e.path}`}
+                    className={`api-item nav-item${e.path === active?.path ? ' selected active' : ''}`}
+                    title={`${e.method || 'GET'} /v1${e.path}`}
+                    aria-current={e.path === active?.path ? 'page' : undefined}
+                  >
+                    <FileText size={17} aria-hidden='true' />
+                    <span>{e.name}</span>
+                  </Link>
+                ))}
+            </details>
+          ))}
+          {!endpoints.length && (
+            <p className='reference-empty' role='status'>
+              {translate('没有匹配的接口，请尝试其他关键词。')}
+            </p>
+          )}
+        </nav>
+        <Link to='/status' className='reference-status-link'>
+          {translate('查看接口状态 ')}
+          <ArrowRight size={14} />
+        </Link>
+      </aside>
+      <article
+        className='api-document'
+        aria-label={
+          active?.name ||
+          translate(referenceGuides.find((g) => g.id === guide)?.title || '')
+        }
+      >
+        {hash && !active && !referenceGuides.some((g) => g.id === hash) && (
+          <p className='reference-callout'>
+            {translate('未找到此文档条目，请从目录选择接口。')}
+          </p>
+        )}
+        {active ? (
+          <EndpointReference
+            key={active.path}
+            endpoint={active}
+            endpoints={localized}
+          />
+        ) : (
+          <ReferenceGuide
+            id={guide}
+            quickstartScope={
+              catalog.data.find((e) => e.path === '/content/feed')?.scope ||
+              'content:read'
+            }
+          />
+        )}
+        <footer className='reference-footer'>
+          <BookOpen size={15} />
+          <span>{translate('API v1 · 校园服务接口')}</span>
+          <a
+            href={`/openapi.json?lang=${currentLanguage()}`}
+            download='lazycampus-openapi.json'
+          >
+            OpenAPI 3.0.3 <ArrowDownToLine size={13} />
+          </a>
+        </footer>
+      </article>
+    </div>
   )
 }
 
@@ -316,7 +294,7 @@ function EndpointReference({
   return (
     <>
       <p className='reference-eyebrow'>{doc?.group || translate('接口参考')}</p>
-      <h2>{e.name}</h2>
+      <ReferenceHeading>{e.name}</ReferenceHeading>
       <p className='reference-lead'>{doc?.summary || e.description}</p>
       <div className='endpoint-heading'>
         <span className='method-badge' data-method={method}>

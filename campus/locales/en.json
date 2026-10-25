@@ -1523,5 +1523,7 @@
   "读取证明目录和选项 → POST 提交开具 → 每隔至少 2 秒查询状态 → 下载有效 PDF。HTTP 202 表示任务已接收，文件默认保留 24 小时。运行中的同类任务会复用；完成后再次提交会重新开具。": "Read the catalog and options → submit via POST → poll status at intervals of at least 2 seconds → download a valid PDF. HTTP 202 acknowledges the job. Files expire after 24 hours by default. Active jobs are reused; submitting after completion issues a new certificate.",
   "接口示例使用演示数据。学期、课程、楼栋、伙伴与证明标识，请从授权查询结果获取。查询使用 GET，证明开具使用 POST 和独立权限。": "Examples use demonstration data. Obtain semester, course, building, companion and certificate IDs from authorized query results. Queries use GET; certificate issuance uses POST and a separate permission.",
   "解析；失败时则返回 JSON 错误。PDF 最大 20 MiB，其他响应最大 16 MiB。附件名取自通知正文，服务端不保证返回原始文件名。": "to parse them. Failures return JSON errors. PDFs are capped at 20 MiB; other responses at 16 MiB. Take attachment names from the notice body; the server may not return the original name.",
-  "应用只能调用已授权接口；伙伴数据还须有有效绑定关系。证明开具需要独立权限，其他学校数据和账号绑定不提供写入接口。": "Applications can only call authorized endpoints; companion data also requires a valid binding. Certificate issuance requires a separate permission. Other school data and account bindings do not expose write operations."
+  "应用只能调用已授权接口；伙伴数据还须有有效绑定关系。证明开具需要独立权限，其他学校数据和账号绑定不提供写入接口。": "Applications can only call authorized endpoints; companion data also requires a valid binding. Certificate issuance requires a separate permission. Other school data and account bindings do not expose write operations.",
+  "无法下载 OpenAPI，请稍后重试。": "Unable to download OpenAPI. Please try again later.",
+  "正在下载…": "Downloading…"
 }

@@ -6,6 +6,7 @@ import { translate, useLocale } from '@/i18n/translate'
 import { CodeBlock } from './code-block'
 import { RequestExample } from './reference-code'
 import { apiOrigin, apiErrors } from './reference-data'
+import { ReferenceHeading } from './reference-heading'
 import { useSession } from './session'
 
 export function ReferenceGuide({
@@ -21,7 +22,7 @@ export function ReferenceGuide({
     return (
       <>
         <p className='reference-eyebrow'>{translate('接入指南 / 02')}</p>
-        <h2>{translate('鉴权与权限')}</h2>
+        <ReferenceHeading>{translate('鉴权与权限')}</ReferenceHeading>
         <p className='reference-lead'>
           {translate(
             '每个应用使用独立密钥，数据访问范围由所属学校身份和应用权限共同决定。'
@@ -85,7 +86,7 @@ export function ReferenceGuide({
     return (
       <>
         <p className='reference-eyebrow'>{translate('接入指南 / 03')}</p>
-        <h2>{translate('响应与分页')}</h2>
+        <ReferenceHeading>{translate('响应与分页')}</ReferenceHeading>
         <p className='reference-lead'>
           {translate(
             '先判断 HTTP 状态与 Content-Type，再解析响应体。成功不一定意味着数据刚刚更新。'
@@ -280,7 +281,7 @@ export function ReferenceGuide({
     return (
       <>
         <p className='reference-eyebrow'>{translate('接入指南 / 04')}</p>
-        <h2>{translate('额度与错误处理')}</h2>
+        <ReferenceHeading>{translate('额度与错误处理')}</ReferenceHeading>
         <p className='reference-lead'>
           {translate(
             '所有接口免费。账户、应用和接口限制同时生效，创建多个应用不会增加账户可用额度。'
@@ -419,7 +420,7 @@ export function ReferenceGuide({
   return (
     <>
       <p className='reference-eyebrow'>LAZY CAMPUS / OPEN API v1</p>
-      <h2>{translate('把校园数据接入你的应用')}</h2>
+      <ReferenceHeading>{translate('把校园数据接入你的应用')}</ReferenceHeading>
       <p className='reference-lead'>
         {translate(
           '通过标准 HTTP 接口，在自己的服务或脚本中读取课表、成绩、考试与校园信息。'

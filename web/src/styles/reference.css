@@ -624,13 +624,36 @@
   box-shadow: none;
 }
 .reference-v3 .api-list {
+  position: fixed;
+  left: 16px;
+  top: 88px;
+  bottom: 16px;
+  width: 192px;
+  max-height: none;
   background: transparent;
   border-right: 0;
   padding: 0 16px 16px 0;
 }
 .reference-v3 .api-document {
+  grid-column: 2;
   max-width: 1400px;
-  padding: clamp(24px, 3vw, 44px);
+  padding: 14px clamp(24px, 3vw, 44px) 32px;
+}
+.reference-document-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+.reference-document-title h1 {
+  font-size: clamp(24px, 2.1vw, 32px);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.4;
+}
+.reference-document-title > button {
+  flex: none;
 }
 .reference-directory-heading,
 .reference-nav-group > summary {
@@ -707,6 +730,18 @@ details[open] > summary > .reference-disclosure-icon {
   font-size: 15px;
   font-weight: 600;
   color: var(--foreground);
+  user-select: none;
+  -webkit-user-select: none;
+  background: transparent;
+}
+.reference-v3 .reference-nav-group > summary:hover,
+.reference-v3 .reference-nav-group > summary:active {
+  background: transparent;
+}
+.reference-v3 .reference-nav-title,
+.reference-v3 .reference-directory-heading {
+  user-select: none;
+  -webkit-user-select: none;
 }
 .reference-v3 .api-item code {
   white-space: normal;
@@ -836,8 +871,7 @@ details[open] > summary > .reference-disclosure-icon {
   font-size: 12px;
 }
 @media (hover: hover) and (pointer: fine) {
-  .reference-page-nav button:hover,
-  .reference-nav-group > summary:hover {
+  .reference-page-nav button:hover {
     background: var(--secondary);
     color: var(--foreground);
   }
@@ -858,13 +892,22 @@ details[open] > summary > .reference-disclosure-icon {
   }
   .reference-v3 .api-list {
     position: static;
+    width: auto;
+    top: auto;
+    bottom: auto;
     max-height: 280px;
   }
   .reference-v3 .api-document {
+    grid-column: 1;
     padding: 24px;
   }
 }
 @media (max-width: 480px) {
+  .reference-document-title {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
   .reference-shell .platform-body {
     margin-left: 0;
   }

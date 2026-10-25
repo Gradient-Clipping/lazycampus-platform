@@ -73,6 +73,9 @@ func expandReference(value any) any {
 }
 
 func (a *App) openAPI(c *gin.Context) {
+	if c.Query("download") == "1" {
+		c.Header("Content-Disposition", `attachment; filename="lazycampus-openapi.json"`)
+	}
 	tr := func(value string) string { return translateText(requestLanguage(c), value) }
 	entries, err := a.catalogEntries()
 	if err != nil {

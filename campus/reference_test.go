@@ -102,4 +102,9 @@ func TestOpenAPIExportsCurrentPolicyAndResponseContracts(t *testing.T) {
 	assert.Contains(t, list.Body.String(), "documentation")
 	assert.NotContains(t, list.Body.String(), `"$ref"`, "reader receives expandable field schemas")
 	assert.NotContains(t, perform(a, "GET", "/api/site", "", "", "").Body.String(), "response_schema", "public site metadata stays lightweight")
+	download := perform(a, "GET", "/openapi.json?download=1", "", "", "")
+	require.Equal(t, 200, download.Code)
+	assert.Contains(t, download.Header().Get("Content-Type"), "application/json")
+	assert.Contains(t, download.Header().Get("Content-Disposition"), "lazycampus-openapi.json")
+	assert.True(t, json.Valid(download.Body.Bytes()))
 }
