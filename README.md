@@ -68,12 +68,12 @@ Logo 使用质量 0.9 的 WebP，保留原始尺寸；浏览器圆形图标使�
 
 ## 开发者接口文档
 
-[在线文档](https://platform.lazycampus.com/api-reference) 包含四篇接入指南和 32 个接口的参数、字段、示例、关联流程及在线调试。文档页独立使用完整宽度，顶部保留入口；目录支持分组折叠和搜索。每个接口有独立链接，例如[课表](https://platform.lazycampus.com/api-reference#api/teaching/timetable)。示例支持 cURL（Bash）、Node.js 和 Python 标准库，密钥从 `LAZYCAMPUS_API_KEY` 环境变量读取。
+[在线文档](https://platform.lazycampus.com/api-reference) 包含五篇接入指南和 27 个接口的参数、字段、示例、关联流程及在线调试。文档页独立使用完整宽度，顶部保留入口；目录支持分组折叠和搜索。每个接口有独立链接，例如[课表](https://platform.lazycampus.com/api-reference#api/teaching/timetable)。示例支持 cURL（Bash）、Node.js 和 Python 标准库，密钥从 `LAZYCAMPUS_API_KEY` 环境变量读取。
 
 - 唯一数据入口为 `https://platform.lazycampus.com/v1`，使用 `Authorization: Bearer <应用密钥>`。控制台的 SSO 会话与开放 API 密钥分别使用。
 - [OpenAPI 3.0.3 契约](https://platform.lazycampus.com/openapi.json) 可导入支持 OpenAPI 的接口工具，包含参数类型、默认值、约束、响应结构、示例、错误和响应头。权限、状态及限流按当前后台配置生成。
 - `campus/catalog.go` 定义允许的路由和查询参数；`campus/reference.json` 保存公共接口的补充契约；`campus/reference.go` 生成 OpenAPI 并向 `/api/catalog` 提供展开的字段结构。前端直接读取同一契约，不另维护一份响应字段表。修改校园数据结构时同步这份契约及对应测试。
-- 文档只包含开放版本允许的参数。`page` 和 `pageSize` 最大均为 100；成绩和考试默认每页 50 条、消息和通知 20 条、空教室 30 条；一次最多查询 5 栋楼。教务不提供强制刷新，洗衣设备及证明目录可使用其明确列出的 `refresh` 参数；不提供写入日程、管理伙伴绑定、绑定寝室或公告媒体下载接口。
+- 文档只包含开放版本允许的参数。`page` 和 `pageSize` 最大均为 100；成绩和考试默认每页 50 条、消息和通知 20 条、空教室 30 条；一次最多查询 5 栋楼。教务不提供强制刷新，仅证明目录可使用其明确列出的 `refresh` 参数；不提供写入日程、管理伙伴绑定、绑定寝室或公告媒体下载接口。
 - 校历和通知附件成功时返回二进制；网关最大响应为 16 MiB。附件原文件名从通知正文获取。校园服务透传错误可能使用 `requestId`，网关错误使用 `request_id`；排障统一优先记录 `X-Request-Id` 响应头。
 - 在线调试使用真实密钥并消耗实际额度，不将密钥写入 URL、示例、浏览器持久存储或日志。切换接口或刷新页面后清空；二进制响应显示字节数，下载使用示例代码。
 
@@ -110,11 +110,11 @@ flowchart TD
 
 开放平台存储账号关联、密钥摘要、额度、调用记录、运营配置、通知偏好及设备会话元数据，不保存学校密码或复制校园数据。校园数据由 Easy SWU 共用服务查询。平台通过内部 HMAC 签名传递学校身份，Easy SWU 再通过 Identity Bridge 验证身份状态并读取校园凭据。开发者密钥不会转发给学校系统，也不能替换小程序的设备凭据。
 
-共用查询继续使用已有缓存、持久快照和校园会话。开放平台与小程序共享北京时间“用户当天首次活动”标记，首次调用在响应后由同一协调器后台同步成绩、课表和考试；已有缓存可能先返回旧数据，同步完成后读取新数据，失败保留缓存并释放标记供后续活动重试。没有缓存时沿用小程序的按需查询。教务接口不接受强制刷新参数，洗衣设备和证明目录仅接受各自列出的刷新选项。
+共用查询继续使用已有缓存、持久快照和校园会话。开放平台与小程序共享北京时间“用户当天首次活动”标记，首次调用在响应后由同一协调器后台同步成绩、课表和考试；已有缓存可能先返回旧数据，同步完成后读取新数据，失败保留缓存并释放标记供后续活动重试。没有缓存时沿用小程序的按需查询。教务接口不接受强制刷新参数，宿舍洗衣仅使用本人绑定并按需查询，证明目录接受明确列出的刷新选项。
 
 ## 接口与权限
 
-共 32 个接口，前缀为 `/v1`；除证明开具为 POST，其余均为 GET。所有接口都需要有效学校身份；伙伴接口额外检查已有绑定关系。
+共 27 个接口，前缀为 `/v1`；除证明开具为 POST，其余均为 GET。所有接口都需要有效学校身份；伙伴接口额外检查已有绑定关系。
 
 | 权限 | 接口 |
 | --- | --- |
@@ -125,10 +125,10 @@ flowchart TD
 | messages:read | /teaching/messages |
 | notices:read | /teaching/notices、/teaching/notices/detail、/teaching/notices/attachment |
 | rooms:read | /teaching/rooms/options、/teaching/rooms |
-| electricity:read | /utilities/electricity/account、/utilities/electricity/buildings、/utilities/electricity/details |
+| electricity:read | /utilities/electricity/account、/utilities/electricity/details |
 | content:read | /content/feed |
 | companions:read | /teaching/companions、/teaching/companions/{id}/timetable、/teaching/companions/{id}/schedule |
-| laundry:read | /utilities/laundry/campuses、/utilities/laundry/buildings、/utilities/laundry/positions、/utilities/laundry/account、/utilities/laundry/devices |
+| laundry:read | /utilities/laundry/devices |
 | documents:read | /campus-documents/certificates、/campus-documents/certificates/state、/campus-documents/certificates/{id}/options、/campus-documents/files/{id} |
 | documents:issue | POST /campus-documents/certificates/{id}/issue |
 
@@ -229,3 +229,7 @@ EdgeOne 为平台域名禁用边缘及离线缓存，并设置回源鉴权头。
 本项目基于 [QuantumNous/new-api](https://github.com/QuantumNous/new-api) 的 React 控制台组件与 Go/Gin/GORM 技术结构改造，保留表格、表单、弹窗、主题及相关组件，面向校园接口重构身份、授权、配额和查询服务。参考上游提交为 `bdef117505247769268b209665fb3ad7554c3da7`。
 
 仓库从本项目的初始提交开始维护，不保留完整上游提交历史。采用 [GNU AGPL v3](LICENSE)，保留所使用源码的版权与许可证声明；部署者应提供其实际运行版本的对应源码。本仓库只保留这一份中文 README。
+
+## MCP 接入
+
+`https://platform.lazycampus.com/mcp` 提供无状态 Streamable HTTP 和 JSON 响应，使用与 REST 相同的 `Authorization: Bearer <应用密钥>`，面向支持自定义请求头的客户端；没有 OAuth 登录流程。MCP 按应用当前权限和接口状态发布 24 项具名结构化工具，数据调用共享现有网关的身份、IP、配额、并发、日志与后台同步。连接与发现不占数据额度，协议另限每 IP 每分钟 120 次。证明开具需 `documents:issue` 和 `confirm: true`，不可自动重复提交。图片/PDF/附件使用对应 REST 下载；`lazycampus://guide` 提供 AI 工作流程，具体配置见[接入指南最后一项](https://platform.lazycampus.com/api-reference#mcp)。

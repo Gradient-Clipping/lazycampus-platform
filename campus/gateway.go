@@ -32,35 +32,10 @@ func (a *App) gateway(c *gin.Context) {
 		return
 	}
 	entry.Endpoint = endpoint.Path
-	key, bearer := strings.CutPrefix(c.GetHeader("Authorization"), "Bearer ")
-	if !bearer || !strings.HasPrefix(key, "lc_") || len(key) != 46 {
-		failure(c, 401, "INVALID_API_KEY", "应用密钥无效")
+	token, user, ok := a.authenticateAPI(c, &entry)
+	if !ok {
 		return
 	}
-	var token Token
-	var user User
-	if a.DB.Where("key_hash = ?", digest(key)).First(&token).Error != nil {
-		failure(c, 401, "INVALID_API_KEY", "应用密钥无效或已过期")
-		return
-	}
-	entry.UserID, entry.TokenID, entry.TokenName = token.UserID, token.ID, token.Name
-	if !token.Enabled || token.Suspended || token.RevokedAt != nil || (token.ExpiresAt != nil && !token.ExpiresAt.After(time.Now())) {
-		code := "APP_DISABLED"
-		if token.Suspended {
-			code = "APP_SUSPENDED"
-		} else if token.RevokedAt != nil {
-			code = "APP_REVOKED"
-		} else if token.ExpiresAt != nil && !token.ExpiresAt.After(time.Now()) {
-			code = "APP_EXPIRED"
-		}
-		failure(c, 401, code, "应用已停用、撤销或到期")
-		return
-	}
-	if a.DB.First(&user, token.UserID).Error != nil || !user.Enabled {
-		failure(c, 403, "ACCOUNT_DISABLED", "当前账号不可用")
-		return
-	}
-	entry.UserName = user.Username
 	var endpointPolicy EndpointPolicy
 	if a.DB.First(&endpointPolicy, "path = ?", endpoint.Path).Error != nil {
 		failure(c, 503, "POLICY_UNAVAILABLE", "接口设置暂时不可用")
@@ -73,14 +48,6 @@ func (a *App) gateway(c *gin.Context) {
 	endpoint.Scope, endpoint.Cooldown = endpointPolicy.Scope, endpointPolicy.Cooldown
 	if !slices.Contains(strings.Fields(token.Scopes), endpoint.Scope) {
 		failure(c, 403, "SCOPE_REQUIRED", "应用没有此接口的权限")
-		return
-	}
-	if !allowedIP(token.AllowedIPs, c.ClientIP()) {
-		failure(c, 403, "IP_NOT_ALLOWED", "当前 IP 不在允许范围内")
-		return
-	}
-	if !identityID.MatchString(user.IdentityID) {
-		failure(c, 403, "SCHOOL_IDENTITY_REQUIRED", "此接口需要学校身份")
 		return
 	}
 	if err := validateQuery(c.Request.URL.Query(), endpoint); err != nil {
@@ -321,4 +288,46 @@ func gatewayBody(c *gin.Context, e Endpoint) ([]byte, error) {
 		}
 	}
 	return raw, nil
+}
+
+// Shared by REST and MCP; credentials are revalidated for every data call.
+func (a *App) authenticateAPI(c *gin.Context, entry *Log) (Token, User, bool) {
+	key, bearer := strings.CutPrefix(c.GetHeader("Authorization"), "Bearer ")
+	if !bearer || !strings.HasPrefix(key, "lc_") || len(key) != 46 {
+		failure(c, 401, "INVALID_API_KEY", "应用密钥无效")
+		return Token{}, User{}, false
+	}
+	var token Token
+	var user User
+	if a.DB.Where("key_hash = ?", digest(key)).First(&token).Error != nil {
+		failure(c, 401, "INVALID_API_KEY", "应用密钥无效或已过期")
+		return Token{}, User{}, false
+	}
+	entry.UserID, entry.TokenID, entry.TokenName = token.UserID, token.ID, token.Name
+	if !token.Enabled || token.Suspended || token.RevokedAt != nil || (token.ExpiresAt != nil && !token.ExpiresAt.After(time.Now())) {
+		code := "APP_DISABLED"
+		if token.Suspended {
+			code = "APP_SUSPENDED"
+		} else if token.RevokedAt != nil {
+			code = "APP_REVOKED"
+		} else if token.ExpiresAt != nil && !token.ExpiresAt.After(time.Now()) {
+			code = "APP_EXPIRED"
+		}
+		failure(c, 401, code, "应用已停用、撤销或到期")
+		return Token{}, User{}, false
+	}
+	if a.DB.First(&user, token.UserID).Error != nil || !user.Enabled {
+		failure(c, 403, "ACCOUNT_DISABLED", "当前账号不可用")
+		return Token{}, User{}, false
+	}
+	entry.UserName = user.Username
+	if !allowedIP(token.AllowedIPs, c.ClientIP()) {
+		failure(c, 403, "IP_NOT_ALLOWED", "当前 IP 不在允许范围内")
+		return Token{}, User{}, false
+	}
+	if !identityID.MatchString(user.IdentityID) {
+		failure(c, 403, "SCHOOL_IDENTITY_REQUIRED", "此接口需要学校身份")
+		return Token{}, User{}, false
+	}
+	return token, user, true
 }

@@ -115,6 +115,7 @@ func (a *App) Router() *gin.Engine {
 		success(c, gin.H{"name": "Lazy Campus 开放平台", "revision": a.Config.Revision, "source": "https://github.com/Gradient-Clipping/lazycampus-platform", "sso_only": true})
 	})
 	r.GET("/openapi.json", a.openAPI)
+	r.Any("/mcp", a.mcpHTTP)
 	r.GET("/api/announcements", a.announcements)
 	r.GET("/api/site", a.publicSite)
 	api := r.Group("/api", a.sessionAuth)

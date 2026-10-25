@@ -262,6 +262,19 @@ it('downloads a verified JSON contract beside the document title and rejects HTM
   await waitFor(() => expect(error).toHaveBeenCalledTimes(1))
   expect(create).toHaveBeenCalledTimes(1)
 })
+
+it('places MCP last in the guides and explains scoped tools and write consent', async () => {
+  view('mcp')
+  expect(await screen.findByRole('heading', { name: 'MCP 接入' })).toBeVisible()
+  const guides = document.querySelectorAll('.reference-guide-item')
+  expect([...guides].at(-1)?.textContent).toContain('MCP 接入')
+  expect(screen.getByText('https://platform.lazycampus.com/mcp')).toBeVisible()
+  expect(screen.getByText(/开具证明需 documents:issue 权限/)).toHaveTextContent(
+    'confirm: true'
+  )
+  expect(screen.getByText(/MCP 提供 24 项结构化数据工具/)).toBeVisible()
+})
+
 function view(hash = 'start') {
   const root = createRootRoute()
   const route = createRoute({

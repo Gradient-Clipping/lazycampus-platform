@@ -7,6 +7,7 @@ import { CodeBlock } from './code-block'
 import { RequestExample } from './reference-code'
 import { apiOrigin, apiErrors } from './reference-data'
 import { ReferenceHeading } from './reference-heading'
+import { McpGuide } from './reference-mcp'
 import { useSession } from './session'
 
 export function ReferenceGuide({
@@ -18,6 +19,7 @@ export function ReferenceGuide({
 }) {
   useLocale()
   const { user, limits } = useSession()
+  if (id === 'mcp') return <McpGuide />
   if (id === 'authentication') {
     return (
       <>
@@ -404,7 +406,7 @@ export function ReferenceGuide({
           )}{' '}
           <code>Retry-After</code>
           {translate(
-            '；总额度用尽时停止重试。502、503 可逐次增加等待时间并加入少量随机延迟，建议最多重试 2 次；每次接纳都会计入额度。'
+            '；总额度用尽时停止重试。GET 遇到 502、503 可增加等待时间并加入少量随机延迟，最多重试 2 次；每次接纳都会计入额度。证明开具请先查状态，不自动重复提交。'
           )}
         </p>
         <p>

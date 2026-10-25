@@ -3500,6 +3500,45 @@
                   "type": "integer"
                 }
               }
+            },
+            "binding": {
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "campus": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "aliases": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "roomNumber": {
+                  "type": "string"
+                },
+                "boundAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "changedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true
+                },
+                "source": {
+                  "type": "string"
+                },
+                "independent": {
+                  "type": "boolean"
+                }
+              }
             }
           }
         },
@@ -5025,16 +5064,14 @@
       }
     },
     "/utilities/electricity/account": {
-      "group": "寝室电费",
+      "group": "宿舍生活",
       "summary": "读取本人已绑定寝室的最近电费余额与用电记录。",
       "notes": [
         "未绑定时 binding 和 account 为 null；先在 Easy SWU 小程序绑定寝室。",
         "此接口不会绑定寝室或主动查询最新电费。用 accountFetchedAt 显示账单的实际更新时间。",
         "金额单位为元，用电量单位为 kWh；电补助为 null 与数值 0 含义不同。"
       ],
-      "related": [
-        "/utilities/electricity/buildings"
-      ],
+      "related": [],
       "parameters": {},
       "content_type": "application/json",
       "response_schema": {
@@ -5077,36 +5114,6 @@
         "meta": {
           "cached": false,
           "fetchedAt": "2026-08-17T11:20:00.000Z"
-        }
-      }
-    },
-    "/utilities/electricity/buildings": {
-      "group": "寝室电费",
-      "summary": "读取校园能源系统的宿舍楼编码与名称。",
-      "notes": [
-        "楼栋列表仅用于识别已有寝室，开放平台暂不提供寝室绑定接口。"
-      ],
-      "related": [
-        "/utilities/electricity/account"
-      ],
-      "parameters": {},
-      "content_type": "application/json",
-      "response_schema": {
-        "$ref": "#/components/schemas/ElectricityBuildingsDataResponse"
-      },
-      "response_example": {
-        "success": true,
-        "data": {
-          "buildings": [
-            {
-              "id": "100121",
-              "name": "楠园1舍"
-            },
-            {
-              "id": "100122",
-              "name": "楠园2舍"
-            }
-          ]
         }
       }
     },
@@ -5233,7 +5240,7 @@
       }
     },
     "/utilities/electricity/details": {
-      "group": "寝室电费",
+      "group": "宿舍生活",
       "summary": "读取绑定寝室的近 30 天用电明细。",
       "notes": [
         "寝室须先在小程序绑定；未绑定时 binding/account 为 null。",
@@ -5305,223 +5312,19 @@
         }
       }
     },
-    "/utilities/laundry/campuses": {
-      "group": "洗衣服务",
-      "summary": "获取洗衣服务校区。",
-      "notes": [
-        "校区、楼栋和点位标识使用接口结果，不要硬编码；目录缓存与小程序共享。"
-      ],
-      "related": [
-        "/utilities/laundry/buildings"
-      ],
-      "parameters": {},
-      "content_type": "application/json",
-      "response_schema": {
-        "$ref": "#/components/schemas/LaundryCampusesResponse"
-      },
-      "response_example": {
-        "success": true,
-        "data": {
-          "campuses": [
-            {
-              "id": "beibei",
-              "name": "Beibei"
-            }
-          ]
-        },
-        "meta": {
-          "cached": true,
-          "stale": false,
-          "fetchedAt": "2026-10-25T08:00:00Z"
-        }
-      }
-    },
-    "/utilities/laundry/buildings": {
-      "group": "洗衣服务",
-      "summary": "获取指定校区的洗衣宿舍楼。",
-      "notes": [
-        "校区、楼栋和点位标识使用接口结果，不要硬编码；目录缓存与小程序共享。"
-      ],
-      "related": [
-        "/utilities/laundry/positions",
-        "/utilities/laundry/account"
-      ],
-      "parameters": {
-        "campus": {
-          "description": "校区标识；从洗衣校区接口获取。",
-          "schema": {
-            "type": "string",
-            "enum": [
-              "beibei",
-              "rongchang"
-            ],
-            "default": "beibei"
-          },
-          "example": "beibei"
-        }
-      },
-      "content_type": "application/json",
-      "response_schema": {
-        "$ref": "#/components/schemas/LaundryBuildingsResponse"
-      },
-      "response_example": {
-        "success": true,
-        "data": {
-          "campus": "beibei",
-          "buildings": []
-        },
-        "meta": {
-          "cached": true,
-          "stale": false,
-          "fetchedAt": "2026-10-25T08:00:00Z"
-        }
-      }
-    },
-    "/utilities/laundry/positions": {
-      "group": "洗衣服务",
-      "summary": "按新旧宿舍名称检索洗衣点位。",
-      "notes": [
-        "校区、楼栋和点位标识使用接口结果，不要硬编码；目录缓存与小程序共享。"
-      ],
-      "related": [
-        "/utilities/laundry/devices"
-      ],
-      "parameters": {
-        "campus": {
-          "description": "校区标识；从洗衣校区接口获取。",
-          "schema": {
-            "type": "string",
-            "enum": [
-              "beibei",
-              "rongchang"
-            ],
-            "default": "beibei"
-          },
-          "example": "beibei"
-        },
-        "name": {
-          "description": "宿舍名称；省略时列出全部点位。",
-          "schema": {
-            "type": "string",
-            "maxLength": 160
-          }
-        }
-      },
-      "content_type": "application/json",
-      "response_schema": {
-        "$ref": "#/components/schemas/LaundryPositionsResponse"
-      },
-      "response_example": {
-        "success": true,
-        "data": {
-          "campus": "beibei",
-          "positions": []
-        },
-        "meta": {
-          "cached": true,
-          "stale": false,
-          "fetchedAt": "2026-10-25T08:00:00Z"
-        }
-      }
-    },
-    "/utilities/laundry/account": {
-      "group": "洗衣服务",
-      "summary": "读取本人保存的洗衣寝室绑定。",
-      "notes": [
-        "绑定或修改寝室请在小程序完成；未绑定时 binding=null。"
-      ],
-      "related": [
-        "/utilities/laundry/buildings",
-        "/utilities/laundry/devices"
-      ],
-      "parameters": {},
-      "content_type": "application/json",
-      "response_schema": {
-        "$ref": "#/components/schemas/LaundryAccountResponse"
-      },
-      "response_example": {
-        "success": true,
-        "data": {
-          "binding": null,
-          "electricitySuggestion": null,
-          "serverNow": "2026-10-25T08:00:00Z"
-        },
-        "meta": {
-          "cached": true,
-          "stale": false,
-          "fetchedAt": "2026-10-25T08:00:00Z"
-        }
-      }
-    },
     "/utilities/laundry/devices": {
-      "group": "洗衣服务",
-      "summary": "查询洗衣机与烘干机状态。",
+      "group": "宿舍生活",
+      "summary": "仅查询本人已绑定宿舍的洗衣机和烘干机状态。",
       "notes": [
-        "positionId 与 name 必须二选一；设备剩余时间结合 serverNow 和 expectedFinishAt 使用。",
-        "复用小程序的按需刷新、共享缓存和请求合并；stale=true 时保留更新时间，不将旧状态当作实时状态。"
+        "不接受校区、楼栋、点位、类型或刷新参数；只使用本人在小程序保存的宿舍绑定。",
+        "未绑定时返回 binding=null、devices=[]，不会查询上游；绑定或修改宿舍请在小程序完成。",
+        "绑定后沿用小程序的按需刷新、同宿舍共享缓存与请求合并；可通过 meta.fetchedAt 和 stale 判断更新时间与状态。"
       ],
       "related": [
-        "/utilities/laundry/positions",
-        "/utilities/laundry/account"
+        "/utilities/electricity/account",
+        "/utilities/electricity/details"
       ],
-      "parameters": {
-        "campus": {
-          "description": "校区标识；从洗衣校区接口获取。",
-          "schema": {
-            "type": "string",
-            "enum": [
-              "beibei",
-              "rongchang"
-            ],
-            "default": "beibei"
-          },
-          "example": "beibei"
-        },
-        "positionId": {
-          "description": "点位标识；与 name 必须且只能填写一个。",
-          "schema": {
-            "type": "string",
-            "pattern": "^[1-9][0-9]{0,15}$"
-          },
-          "example": "123"
-        },
-        "name": {
-          "description": "宿舍名称；与 positionId 二选一。",
-          "schema": {
-            "type": "string",
-            "maxLength": 160
-          }
-        },
-        "type": {
-          "description": "设备类型。",
-          "schema": {
-            "type": "string",
-            "enum": [
-              "all",
-              "washer",
-              "dryer"
-            ],
-            "default": "all"
-          },
-          "example": "all"
-        },
-        "refresh": {
-          "description": "沿用小程序刷新逻辑，默认更新；共享缓存和合并请求仍然生效。",
-          "schema": {
-            "type": "boolean",
-            "default": true
-          },
-          "example": true
-        },
-        "preview": {
-          "description": "优先返回已有预览，必要时后台更新。",
-          "schema": {
-            "type": "boolean",
-            "default": false
-          },
-          "example": false
-        }
-      },
+      "parameters": {},
       "content_type": "application/json",
       "response_schema": {
         "$ref": "#/components/schemas/LaundryDevicesResponse"
@@ -5529,21 +5332,8 @@
       "response_example": {
         "success": true,
         "data": {
-          "campus": "beibei",
-          "query": null,
-          "positions": [],
-          "sourceTimeZone": "Asia/Shanghai",
-          "serverNow": "2026-10-25T08:00:00Z",
-          "refreshing": false,
-          "devices": [],
-          "counts": {
-            "washer": 0,
-            "dryer": 0,
-            "idle": 0,
-            "occupied": 0,
-            "fault": 0,
-            "unknown": 0
-          }
+          "binding": null,
+          "devices": []
         },
         "meta": {
           "cached": true,
