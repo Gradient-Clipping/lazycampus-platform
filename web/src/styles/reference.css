@@ -684,6 +684,7 @@ details[open] > summary > .reference-disclosure-icon {
   gap: 10px;
 }
 .reference-v3 .api-item > span {
+  margin: 0;
   font-size: 13px;
   font-weight: 400;
   line-height: 1.5;
@@ -699,7 +700,10 @@ details[open] > summary > .reference-disclosure-icon {
   color: var(--foreground);
 }
 .reference-v3 .reference-nav-group > summary {
-  margin: 25px 8px 10px;
+  margin: 16px 0 6px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  line-height: 1.5;
   font-size: 15px;
   font-weight: 600;
   color: var(--foreground);
@@ -723,7 +727,7 @@ details[open] > summary > .reference-disclosure-icon {
 }
 .reference-v3 .api-item.selected {
   box-shadow: none;
-  border-radius: 999px;
+  border-radius: 12px;
   background: var(--secondary);
   color: var(--secondary-foreground);
 }
