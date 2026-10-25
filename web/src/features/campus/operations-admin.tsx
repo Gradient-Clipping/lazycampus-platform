@@ -374,7 +374,9 @@ export function AdminEndpoints() {
                 {translate(statusLabels[e.status])}
               </Badge>
             </div>
-            <code>GET /v1{e.path}</code>
+            <code>
+              {e.method || 'GET'} /v1{e.path}
+            </code>
             <p>{translate(e.description)}</p>
             <div className='ops-endpoint-footer'>
               <span>
