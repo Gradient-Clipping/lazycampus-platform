@@ -263,20 +263,28 @@ it('downloads a verified JSON contract beside the document title and rejects HTM
   expect(create).toHaveBeenCalledTimes(1)
 })
 
-it('places MCP last in the guides and provides a usable connection example', async () => {
+it('keeps the original MCP reference layout and connection example', async () => {
   view('mcp')
   expect(await screen.findByRole('heading', { name: 'MCP 接入' })).toBeVisible()
   const guides = document.querySelectorAll('.reference-guide-item')
   expect([...guides].at(-1)?.textContent).toContain('MCP 接入')
   const example = JSON.parse(
-    document.querySelector('.api-document pre')?.textContent || ''
+    [...document.querySelectorAll('.api-document pre')].find((block) =>
+      block.textContent?.trim().startsWith('{')
+    )?.textContent || ''
   )
   expect(example.mcpServers.lazycampus).toEqual({
     url: 'https://platform.lazycampus.com/mcp',
-    headers: { Authorization: 'Bearer APPLICATION_KEY' },
+    headers: { Authorization: 'Bearer <APPLICATION_KEY>' },
   })
-  expect(screen.getByText('查询宿舍电费余额和洗衣机状态。')).toBeVisible()
-  expect(screen.getByText(/可用工具由应用权限决定/)).toBeVisible()
+  expect(screen.getByRole('heading', { name: '连接地址与鉴权' })).toBeVisible()
+  expect(screen.getByRole('heading', { name: '检查连接' })).toBeVisible()
+  expect(
+    screen.queryByRole('heading', { name: '可以这样提问' })
+  ).not.toBeInTheDocument()
+  expect(
+    screen.queryByRole('heading', { name: '使用提示' })
+  ).not.toBeInTheDocument()
 })
 
 function view(hash = 'start') {
