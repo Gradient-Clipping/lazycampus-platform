@@ -694,13 +694,13 @@ details[open] > summary > .reference-disclosure-icon {
 .reference-v3 .reference-nav-title {
   margin: 25px 8px 10px;
   padding: 0;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--foreground);
 }
 .reference-v3 .reference-nav-group > summary {
   margin: 25px 8px 10px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--foreground);
 }
@@ -723,9 +723,14 @@ details[open] > summary > .reference-disclosure-icon {
 }
 .reference-v3 .api-item.selected {
   box-shadow: none;
-  border-radius: 14px;
+  border-radius: 999px;
   background: var(--secondary);
   color: var(--secondary-foreground);
+}
+.reference-v3 .reference-directory-heading {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--foreground);
 }
 .reference-v3 .api-list-scroll {
   padding: 2px;
