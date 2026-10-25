@@ -116,6 +116,7 @@ func (a *App) Router() *gin.Engine {
 	})
 	r.GET("/openapi.json", a.openAPI)
 	r.Any("/mcp", a.mcpHTTP)
+	r.Any("/graphql", a.graphqlHTTP)
 	r.GET("/api/announcements", a.announcements)
 	r.GET("/api/site", a.publicSite)
 	api := r.Group("/api", a.sessionAuth)

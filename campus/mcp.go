@@ -184,6 +184,21 @@ func mcpLocalizedSchema(value any) any {
 }
 
 func (a *App) mcpCall(ctx context.Context, base *gin.Context, e Endpoint, args map[string]any) (*mcp.CallToolResult, any, error) {
+	output, err := a.callCampusEndpoint(ctx, base, e, args)
+	if err != nil {
+		return mcpInvalidArguments(err.Error())
+	}
+	payload := output["response"].(map[string]any)
+	failed := output["httpStatus"].(int) >= 400 || payload["success"] == false
+	return &mcp.CallToolResult{IsError: failed}, output, nil
+}
+
+var errCampusResultTooLarge = errors.New("RESULT_TOO_LARGE: narrow the filters or reduce pageSize. Use the REST API for bulk downloads.")
+var errCampusInvalidJSON = errors.New("Invalid campus JSON response. Use requestId to report the error.")
+
+// All protocol adapters execute the same REST gateway, including authorization,
+// quota reservation, signed upstream requests and per-endpoint diagnostics.
+func (a *App) callCampusEndpoint(ctx context.Context, base *gin.Context, e Endpoint, args map[string]any) (map[string]any, error) {
 	path, query := e.Path, url.Values{}
 	for _, p := range e.Parameters {
 		value, present := args[p.Name]
@@ -193,7 +208,7 @@ func (a *App) mcpCall(ctx context.Context, base *gin.Context, e Endpoint, args m
 		text := fmt.Sprint(value)
 		if e.parameterIn(p) == "path" {
 			if !pathID.MatchString(text) {
-				return mcpInvalidArguments("Invalid resource identifier; obtain it from the corresponding list tool.")
+				return nil, errors.New("Invalid resource identifier; obtain it from the corresponding list or options query.")
 			}
 			path = strings.ReplaceAll(path, "{"+p.Name+"}", text)
 		} else {
@@ -203,7 +218,7 @@ func (a *App) mcpCall(ctx context.Context, base *gin.Context, e Endpoint, args m
 	var body []byte
 	if e.Method == http.MethodPost {
 		if args["confirm"] != true {
-			return mcpInvalidArguments("Explicit user consent is required before issuing a certificate.")
+			return nil, errors.New("Explicit user consent is required before issuing a certificate.")
 		}
 		input := map[string]any{}
 		if selected, ok := args["selected"]; ok {
@@ -227,15 +242,13 @@ func (a *App) mcpCall(ctx context.Context, base *gin.Context, e Endpoint, args m
 	a.gateway(c)
 	payload := map[string]any{}
 	if capture.body.Len() > 2*1024*1024 {
-		return &mcp.CallToolResult{IsError: true, Content: []mcp.Content{&mcp.TextContent{Text: "MCP_RESULT_TOO_LARGE: narrow the filters or reduce pageSize. Use the REST API for bulk downloads."}}}, nil, nil
+		return nil, errCampusResultTooLarge
 	}
-	if json.Unmarshal(capture.body.Bytes(), &payload) != nil {
-		return &mcp.CallToolResult{IsError: true, Content: []mcp.Content{&mcp.TextContent{Text: "Invalid campus JSON response. Use requestId to report the error."}}}, nil, nil
+	if json.Unmarshal(capture.body.Bytes(), &payload) != nil || payload == nil {
+		return nil, errCampusInvalidJSON
 	}
 	retry, _ := strconv.Atoi(capture.headers.Get("Retry-After"))
-	output := map[string]any{"httpStatus": capture.status, "requestId": c.GetString("requestID"), "quotaRemaining": capture.headers.Get("X-Quota-Remaining"), "retryAfterSeconds": retry, "response": payload}
-	failed := capture.status >= 400 || payload["success"] == false
-	return &mcp.CallToolResult{IsError: failed}, output, nil
+	return map[string]any{"httpStatus": capture.status, "requestId": c.GetString("requestID"), "quotaRemaining": capture.headers.Get("X-Quota-Remaining"), "retryAfterSeconds": retry, "response": payload}, nil
 }
 
 func mcpInvalidArguments(message string) (*mcp.CallToolResult, any, error) {

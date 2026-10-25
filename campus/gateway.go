@@ -290,7 +290,7 @@ func gatewayBody(c *gin.Context, e Endpoint) ([]byte, error) {
 	return raw, nil
 }
 
-// Shared by REST and MCP; credentials are revalidated for every data call.
+// Shared by REST, GraphQL and MCP; credentials are revalidated for every data call.
 func (a *App) authenticateAPI(c *gin.Context, entry *Log) (Token, User, bool) {
 	key, bearer := strings.CutPrefix(c.GetHeader("Authorization"), "Bearer ")
 	if !bearer || !strings.HasPrefix(key, "lc_") || len(key) != 46 {

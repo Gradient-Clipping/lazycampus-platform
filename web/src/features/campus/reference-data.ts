@@ -90,6 +90,7 @@ export const referenceGuides = [
   { id: 'authentication', title: '鉴权与权限' },
   { id: 'responses', title: '响应与分页' },
   { id: 'limits', title: '额度与错误处理' },
+  { id: 'graphql', title: 'GraphQL' },
   { id: 'mcp', title: 'MCP 接入' },
 ] as const
 

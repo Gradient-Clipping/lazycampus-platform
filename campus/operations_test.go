@@ -47,7 +47,8 @@ func apiCall(a *App, key, path string) *httptest.ResponseRecorder {
 func testKey(t *testing.T, a *App, u User) (Token, string) {
 	t.Helper()
 	key := "lc_" + randomKey(32)
-	token := Token{UserID: u.ID, Name: "test app", KeyHash: digest(key), KeyPrefix: key[:12], Scopes: "timetable:read", Enabled: true, DailyQuota: 100, RateLimit: 60, Quota: 1000}
+	// MySQL schemas are isolated, but Redis rate keys are shared across tests.
+	token := Token{ID: uint64(time.Now().UnixMicro()), UserID: u.ID, Name: "test app", KeyHash: digest(key), KeyPrefix: key[:12], Scopes: "timetable:read", Enabled: true, DailyQuota: 100, RateLimit: 60, Quota: 1000}
 	require.NoError(t, a.DB.Create(&token).Error)
 	return token, key
 }

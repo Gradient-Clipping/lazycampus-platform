@@ -6,6 +6,7 @@ import { translate, useLocale } from '@/i18n/translate'
 import { CodeBlock } from './code-block'
 import { RequestExample } from './reference-code'
 import { apiOrigin, apiErrors } from './reference-data'
+import { GraphqlGuide } from './reference-graphql'
 import { ReferenceHeading } from './reference-heading'
 import { McpGuide } from './reference-mcp'
 import { useSession } from './session'
@@ -19,6 +20,7 @@ export function ReferenceGuide({
 }) {
   useLocale()
   const { user, limits } = useSession()
+  if (id === 'graphql') return <GraphqlGuide />
   if (id === 'mcp') return <McpGuide />
   if (id === 'authentication') {
     return (

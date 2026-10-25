@@ -230,6 +230,10 @@ EdgeOne 为平台域名禁用边缘及离线缓存，并设置回源鉴权头。
 
 仓库从本项目的初始提交开始维护，不保留完整上游提交历史。采用 [GNU AGPL v3](LICENSE)，保留所使用源码的版权与许可证声明；部署者应提供其实际运行版本的对应源码。本仓库只保留这一份中文 README。
 
+## GraphQL 接入
+
+`POST https://platform.lazycampus.com/graphql` 使用相同应用 Bearer 密钥，提供 23 项数据查询和 1 项证明开具 Mutation，支持字段选择、变量、别名、片段、自省与部分失败响应。Schema 由现有接口契约生成，JSON 标量保留动态字典和混合成绩值；运行时重新验证当前接口政策、身份、IP、权限和额度。每个顶层数据字段作为一次原接口调用计费、记录日志并触发相同的后台同步；自省和 `apiGuide` 免费，协议另限每 IP 每分钟 120 次。每请求最多 10 个顶层字段、16 层、1,000 个展开选择项，正文 32 KiB、响应 2 MiB；不支持订阅、URL 查询参数或数组批处理。证明 Mutation 需 `confirm: true`，文件通过 REST 下载。AI 指示同时包含在 Query description 和 `apiGuide`；[GraphQL 接入指南](https://platform.lazycampus.com/api-reference#graphql)位于 MCP 上方。
+
 ## MCP 接入
 
 `https://platform.lazycampus.com/mcp` 提供无状态 Streamable HTTP 和 JSON 响应，使用与 REST 相同的 `Authorization: Bearer <应用密钥>`，面向支持自定义请求头的客户端；没有 OAuth 登录流程。MCP 按应用当前权限和接口状态发布 24 项具名结构化工具，数据调用共享现有网关的身份、IP、配额、并发、日志与后台同步。连接与发现不占数据额度，协议另限每 IP 每分钟 120 次。证明开具需 `documents:issue` 和 `confirm: true`，不可自动重复提交。图片/PDF/附件使用对应 REST 下载；`lazycampus://guide` 提供 AI 工作流程，具体配置见[接入指南最后一项](https://platform.lazycampus.com/api-reference#mcp)。

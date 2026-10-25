@@ -8,7 +8,7 @@ export function CodeBlock({
   className = '',
 }: {
   code: string
-  language?: 'bash' | 'json' | 'javascript' | 'python'
+  language?: 'bash' | 'json' | 'javascript' | 'python' | 'graphql'
   className?: string
 }) {
   let pattern =
@@ -19,6 +19,9 @@ export function CodeBlock({
   } else if (language === 'bash') {
     pattern =
       /"(?:\\.|[^"\\])*"|'[^']*'|\bcurl\b|--?[A-Za-z][\w-]*|\b(?:GET|POST|PATCH|PUT|DELETE)\b|\\/g
+  } else if (language === 'graphql') {
+    pattern =
+      /#[^\n]*|"(?:\\.|[^"\\])*"|\$[_A-Za-z][_0-9A-Za-z]*|\b(?:query|mutation|fragment|on|true|false|null)\b|[{}()[\],:!]/g
   }
   const tokens: ReactNode[] = []
   let cursor = 0

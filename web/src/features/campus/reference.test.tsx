@@ -268,6 +268,7 @@ it('keeps the original MCP reference layout and connection example', async () =>
   expect(await screen.findByRole('heading', { name: 'MCP 接入' })).toBeVisible()
   const guides = document.querySelectorAll('.reference-guide-item')
   expect([...guides].at(-1)?.textContent).toContain('MCP 接入')
+  expect([...guides].at(-2)?.textContent).toBe('GraphQL')
   const example = JSON.parse(
     [...document.querySelectorAll('.api-document pre')].find((block) =>
       block.textContent?.trim().startsWith('{')
@@ -285,6 +286,21 @@ it('keeps the original MCP reference layout and connection example', async () =>
   expect(
     screen.queryByRole('heading', { name: '使用提示' })
   ).not.toBeInTheDocument()
+  await userEvent.setup().click(screen.getByRole('link', { name: 'GraphQL' }))
+  expect(await screen.findByRole('heading', { name: 'GraphQL' })).toBeVisible()
+  expect(screen.getByRole('heading', { name: 'Schema 与自省' })).toBeVisible()
+  expect(document.querySelector('.api-document')?.textContent).not.toContain(
+    'AI 应先读取'
+  )
+  expect(document.querySelector('.api-document')?.textContent).not.toContain(
+    '用户明确要求开具后'
+  )
+  expect(document.querySelector('.api-document')?.textContent).toContain(
+    'POST https://platform.lazycampus.com/graphql'
+  )
+  expect(document.querySelector('.api-document')?.textContent).toContain(
+    'issueMyCertificate(id: $id, selected: $selected, confirm: true)'
+  )
 })
 
 function view(hash = 'start') {
