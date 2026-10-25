@@ -69,7 +69,7 @@ export function ReferenceGuide({
         </p>
         <p>
           {translate(
-            '应用始终读取所属学校用户的数据，不接受指定其他学号或用户 ID。控制台使用 Keycloak SSO 登录；浏览器登录会话不能替代应用密钥。'
+            '应用读取所属学校用户的数据；伙伴接口额外验证已有绑定关系。证明开具需要 documents:issue 权限。控制台 SSO 会话不能替代应用密钥。'
           )}
         </p>
         <h3>{translate('IP 白名单与有效期')}</h3>
@@ -181,20 +181,37 @@ export function ReferenceGuide({
           {translate('查询参数使用 UTF-8 和标准 URL 编码，建议使用')}{' '}
           <code>URLSearchParams</code>
           {translate(
-            '。每个参数只传一次；空教室的多个楼栋和节次使用英文逗号分隔。未知参数返回 400。开放平台不提供 '
+            '。每个参数只传一次；空教室的多个楼栋和节次使用英文逗号分隔。未知参数返回 400。只有明确列出参数的接口支持 '
           )}
           <code>refresh</code>
-          {translate('、')}
+          {translate('；教务接口不提供 ')}
           <code>automatic</code>
           {translate(' 或')} <code>waitForSync</code>
           {translate(' 参数。')}
+        </p>
+        <h3>{translate('当天首次活动与后台同步')}</h3>
+        <p>
+          {translate(
+            '开放平台与小程序共用北京时间当天首次活动标记。当天第一次调用会在响应后后台同步成绩、课表和考试；已有缓存可能先返回旧数据，同步完成后的查询读取新数据。并发请求和多个应用不会重复触发同一轮同步。'
+          )}
+        </p>
+        <p>
+          {translate(
+            '同步失败保留可用旧数据，并允许后续活动重试。首次尚无缓存时沿用小程序的按需查询行为；不要把成功响应理解为后台同步已经完成。'
+          )}
+        </p>
+        <h3>{translate('证明开具流程')}</h3>
+        <p>
+          {translate(
+            '读取证明目录和选项 → POST 提交开具 → 每隔至少 2 秒查询状态 → 下载有效 PDF。HTTP 202 表示任务已接收，文件默认保留 24 小时。运行中的同类任务会复用；完成后再次提交会重新开具。'
+          )}
         </p>
         <h3>{translate('图片、附件与时间')}</h3>
         <p>
           {translate('校历原图与通知附件返回二进制，不能调用 ')}
           <code>response.json()</code>{' '}
           {translate(
-            '解析；失败时则返回 JSON 错误。单次响应最多 16 MiB。附件名取自通知正文，服务端不保证返回原始文件名。'
+            '解析；失败时则返回 JSON 错误。PDF 最大 20 MiB，其他响应最大 16 MiB。附件名取自通知正文，服务端不保证返回原始文件名。'
           )}
         </p>
         <p>
@@ -522,7 +539,7 @@ export function ReferenceGuide({
       </div>
       <p className='reference-callout'>
         {translate(
-          '接口示例使用演示数据。学期、课程、楼栋和通知标识，请从自己的查询结果中获取。所有接口只读，密钥仅能访问所属学校用户的数据。'
+          '接口示例使用演示数据。学期、课程、楼栋、伙伴与证明标识，请从授权查询结果获取。查询使用 GET，证明开具使用 POST 和独立权限。'
         )}
       </p>
     </>

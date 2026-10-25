@@ -167,6 +167,7 @@ func (a *App) Router() *gin.Engine {
 	admin.PUT("/notice", a.updateNotice)
 	admin.DELETE("/announcements/:id", a.deleteAnnouncement)
 	r.GET("/v1/*path", a.gateway)
+	r.POST("/v1/*path", a.gateway)
 	r.NoRoute(func(c *gin.Context) {
 		p := c.Request.URL.Path
 		if c.Request.Method != "GET" || strings.HasPrefix(p, "/api/") || strings.HasPrefix(p, "/v1/") || strings.HasPrefix(p, "/auth/") || strings.HasPrefix(p, "/internal/") {

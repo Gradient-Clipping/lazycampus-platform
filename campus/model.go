@@ -11,8 +11,8 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-const DefaultDailyQuota = 1000
-const DefaultRateLimit = 20
+const DefaultDailyQuota = 1500
+const DefaultRateLimit = 30
 
 type User struct {
 	ID            uint64    `json:"id" gorm:"primaryKey"`
@@ -147,10 +147,10 @@ func Migrate(db *gorm.DB) error {
 			return err
 		}
 		for _, user := range users {
-			if err := tx.Model(&user).Update("rate_limit", DefaultRateLimit).Error; err != nil {
+			if err := tx.Model(&user).Update("rate_limit", 20).Error; err != nil {
 				return err
 			}
-			if err := tx.Model(&Token{}).Where("user_id = ? AND rate_limit > ?", user.ID, DefaultRateLimit).Update("rate_limit", DefaultRateLimit).Error; err != nil {
+			if err := tx.Model(&Token{}).Where("user_id = ? AND rate_limit > ?", user.ID, 20).Update("rate_limit", 20).Error; err != nil {
 				return err
 			}
 		}
@@ -180,10 +180,10 @@ func Migrate(db *gorm.DB) error {
 			return err
 		}
 		for _, user := range users {
-			if err := tx.Model(&user).Update("daily_quota", DefaultDailyQuota).Error; err != nil {
+			if err := tx.Model(&user).Update("daily_quota", 1000).Error; err != nil {
 				return err
 			}
-			if err := tx.Model(&Token{}).Where("user_id = ? AND daily_quota > ?", user.ID, DefaultDailyQuota).Update("daily_quota", DefaultDailyQuota).Error; err != nil {
+			if err := tx.Model(&Token{}).Where("user_id = ? AND daily_quota > ?", user.ID, 1000).Update("daily_quota", 1000).Error; err != nil {
 				return err
 			}
 		}

@@ -30,6 +30,9 @@ type endpointReference struct {
 	ContentType     string                        `json:"content_type"`
 	ResponseSchema  map[string]any                `json:"response_schema"`
 	ResponseExample any                           `json:"response_example"`
+	RequestSchema   map[string]any                `json:"request_schema,omitempty"`
+	RequestExample  any                           `json:"request_example,omitempty"`
+	SuccessStatus   int                           `json:"success_status,omitempty"`
 }
 
 var reference = func() struct {
@@ -93,7 +96,7 @@ func (a *App) openAPI(c *gin.Context) {
 		parameters := []any{}
 		for _, p := range e.Parameters {
 			detail := doc.Parameters[p.Name]
-			parameter := gin.H{"in": "query", "name": p.Name, "required": p.Required, "description": detail.Description, "schema": detail.Schema}
+			parameter := gin.H{"in": e.parameterIn(p), "name": p.Name, "required": p.Required, "description": detail.Description, "schema": detail.Schema}
 			if detail.Example != nil {
 				parameter["example"] = detail.Example
 			}
@@ -103,7 +106,11 @@ func (a *App) openAPI(c *gin.Context) {
 		if doc.ResponseExample != nil {
 			content["example"] = doc.ResponseExample
 		}
-		responses := gin.H{"200": gin.H{"description": doc.Summary, "headers": responseHeaders(false), "content": gin.H{doc.ContentType: content}}}
+		status := "200"
+		if doc.SuccessStatus != 0 {
+			status = fmt.Sprint(doc.SuccessStatus)
+		}
+		responses := gin.H{status: gin.H{"description": doc.Summary, "headers": responseHeaders(false), "content": gin.H{doc.ContentType: content}}}
 		if doc.ContentType == "application/octet-stream" {
 			responses["200"].(gin.H)["content"].(gin.H)["image/*"] = gin.H{"schema": gin.H{"type": "string", "format": "binary"}}
 		}
@@ -130,13 +137,17 @@ func (a *App) openAPI(c *gin.Context) {
 		if e.Message != "" {
 			description += tr("\n\n服务提示：") + tr(e.Message)
 		}
-		paths["/v1"+e.Path] = gin.H{"get": gin.H{
+		operation := gin.H{
 			"operationId": strings.NewReplacer("/", "_", "-", "_").Replace(strings.TrimPrefix(e.Path, "/")),
 			"summary":     e.Name, "description": description, "tags": []string{doc.Group},
 			"parameters": parameters, "responses": responses,
 			"x-required-scope": e.Scope, "x-service-status": e.Status,
 			"x-rate-limit-per-minute": e.RateLimit, "x-daily-quota": e.DailyQuota, "x-cooldown-seconds": e.Cooldown,
-		}}
+		}
+		if len(doc.RequestSchema) > 0 {
+			operation["requestBody"] = gin.H{"required": true, "content": gin.H{"application/json": gin.H{"schema": doc.RequestSchema, "example": doc.RequestExample}}}
+		}
+		paths["/v1"+e.Path] = gin.H{strings.ToLower(e.Method): operation}
 	}
 	schemas := gin.H{}
 	for name, schema := range reference.Schemas {
@@ -148,7 +159,7 @@ func (a *App) openAPI(c *gin.Context) {
 		"request_id": gin.H{"type": "string", "description": "开放平台生成的请求标识"},
 		"requestId":  gin.H{"type": "string", "description": "校园服务透传错误中的请求标识；优先记录 X-Request-Id 响应头"},
 	}, "example": gin.H{"success": false, "error": gin.H{"code": "RATE_LIMITED", "message": "请求过于频繁，请稍后重试"}, "request_id": "example-request-id"}}
-	description := fmt.Sprintf(tr("所有接口免费，仅支持 GET，只读取密钥所属学校用户的数据。\n\nBase URL：%s/v1。请求头：Authorization: Bearer <应用密钥>。控制台通过学校 SSO 管理应用，SSO Cookie 不代替 API 密钥。\n\n默认账户和新应用每分钟 %d 次、每天 %d 次；同一用户所有应用共享账户额度。每用户并发上限 %d，突发上限 %d 次/秒。实际限制以账户、应用及接口设置共同约束。分钟窗口从首次请求起持续 60 秒，每日额度在 UTC 00:00（北京时间 08:00）重置。已接纳请求计入额度，包括校园服务返回的错误；鉴权或网关拒绝不扣调用额度，但可能已占用频率窗口。\n\n仅支持各接口列出的查询参数，不支持 refresh、automatic、waitForSync；未知或重复参数返回 400。page 和 pageSize 最大均为 100，buildingIds 每次最多 5 个。\n\nJSON 成功响应为 success/data，部分接口带 meta；图片和附件为二进制。示例数据仅用于说明结构，学期和资源标识请从本人接口结果获取。最多返回 16 MiB。记录 X-Request-Id 用于排障。在线文档：%s/api-reference。"), a.Config.Origin, policy.RateLimit, policy.DailyQuota, policy.UserConcurrency, policy.Burst, a.Config.Origin)
+	description := fmt.Sprintf(tr("所有接口免费。GET 读取本人或已绑定伙伴的授权数据；POST 仅用于本人证明开具，需要独立权限。\n\nBase URL：%s/v1。请求头：Authorization: Bearer <应用密钥>。控制台 SSO Cookie 不代替 API 密钥。\n\n默认账户和新应用每分钟 %d 次、每天 %d 次；同一用户所有应用共享账户额度。每用户并发上限 %d，突发上限 %d 次/秒。账户、应用及接口限制同时生效，每日额度在 UTC 00:00（北京时间 08:00）重置。已接纳请求计入额度，包括校园查询错误；鉴权或网关拒绝不扣调用额度。\n\n与小程序共用北京时间当天首次活动标记。首次调用在响应后后台同步成绩、课表、考试，有缓存时可能先返回旧数据；同步完成后查询读取新数据，失败保留缓存并允许后续活动重试。\n\n仅支持文档列出的路径、查询参数及 JSON 请求体。仅明确标注的接口支持 refresh；教务接口不提供 automatic、waitForSync 或强制刷新。未知或重复查询参数返回 400。page 和 pageSize 最大均为 100，buildingIds 每次最多 5 个。\n\n证明开具 POST 返回 HTTP 202 和 jobId；使用状态接口轮询进度，完成后下载本人 PDF。文件默认保留 24 小时，PDF 最大 20 MiB，其他响应最大 16 MiB。JSON 使用 success/data 和可选 meta，文件返回原始字节。示例数据仅说明结构，标识请从授权查询结果获取。记录 X-Request-Id 排障。在线文档：%s/api-reference。"), a.Config.Origin, policy.RateLimit, policy.DailyQuota, policy.UserConcurrency, policy.Burst, a.Config.Origin)
 	writeLocalizedReference(c, gin.H{"openapi": "3.0.3", "info": gin.H{"title": "Lazy Campus 开放 API", "version": "1.0.0", "description": description}, "servers": []any{gin.H{"url": a.Config.Origin, "description": "生产环境"}}, "tags": tags, "security": []any{gin.H{"apiKey": []string{}}}, "paths": paths, "components": gin.H{"schemas": schemas, "securitySchemes": gin.H{"apiKey": gin.H{"type": "http", "scheme": "bearer", "bearerFormat": "lc_...", "description": "在控制台创建应用后获取密钥；仅能访问该应用被授予的权限。"}}}})
 }
 

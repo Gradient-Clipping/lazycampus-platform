@@ -74,7 +74,7 @@ func TestOpenAPIExportsCurrentPolicyAndResponseContracts(t *testing.T) {
 	var spec map[string]any
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &spec))
 	paths := spec["paths"].(map[string]any)
-	assert.Len(t, paths, 18)
+	assert.Len(t, paths, len(Catalog))
 	grade := paths["/v1/teaching/grades"].(map[string]any)["get"].(map[string]any)
 	assert.Equal(t, "timetable:read", grade["x-required-scope"])
 	assert.Equal(t, "maintenance", grade["x-service-status"])

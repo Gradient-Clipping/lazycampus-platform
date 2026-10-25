@@ -15,7 +15,7 @@ type PlatformPolicy struct {
 }
 
 func defaultPolicy() PlatformPolicy {
-	return PlatformPolicy{DailyQuota: DefaultDailyQuota, RateLimit: 20, AppQuota: 100000, AppDays: 90, MaxApps: 10, Burst: 10, UserConcurrency: 3, GlobalConcurrency: 20}
+	return PlatformPolicy{DailyQuota: DefaultDailyQuota, RateLimit: DefaultRateLimit, AppQuota: 100000, AppDays: 90, MaxApps: 10, Burst: 10, UserConcurrency: 3, GlobalConcurrency: 20}
 }
 
 type EndpointPolicy struct {
@@ -53,7 +53,7 @@ func defaultSite() SiteContent {
 	return SiteContent{Name: "Lazy Campus", Description: "免费校园开放平台", LogoURL: "/logo.webp", HelpURL: "/api-reference", ServiceStatus: "operational", FAQ: []FAQ{
 		{ID: "getting-started-campus", Question: "如何开始调用？", Answer: "使用学校身份进入控制台，创建应用并选择接口权限，将应用密钥保存到自己的服务或脚本中。接口文档提供调用示例与在线调试。"},
 		{ID: "daily-quota-campus-api", Question: "调用额度如何计算？", Answer: "所有应用共用账户每日额度，同时受应用和接口各自的限制。每日额度在 UTC 00:00（北京时间 08:00）重置；已接纳的调用计入额度，权限或限流拒绝不扣额度。"},
-		{ID: "campus-data-permissions", Question: "应用可以访问哪些数据？", Answer: "应用只能读取密钥所属学校用户的数据，且仅能调用授权范围内的接口。开放 API 不支持修改学校数据。"},
+		{ID: "campus-data-permissions", Question: "应用可以访问哪些数据？", Answer: "应用只能调用已授权接口；伙伴数据还须有有效绑定关系。证明开具需要独立权限，其他学校数据和账号绑定不提供写入接口。"},
 	}}
 }
 

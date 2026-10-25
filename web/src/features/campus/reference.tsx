@@ -4,6 +4,8 @@ import {
   ArrowDownToLine,
   ArrowRight,
   BookOpen,
+  FileText,
+  ChevronRight,
   Search,
   Send,
 } from 'lucide-react'
@@ -12,6 +14,7 @@ import { useMemo, useState } from 'react'
 import { CopyButton } from '@/components/copy-button'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   translate,
   useLocale,
@@ -24,7 +27,12 @@ import { CodeBlock } from './code-block'
 import { statusLabels } from './operations-data'
 import { scopeName } from './permissions'
 import { RequestExample } from './reference-code'
-import { apiOrigin, referenceGuides, schemaType } from './reference-data'
+import {
+  apiOrigin,
+  endpointPath,
+  referenceGuides,
+  schemaType,
+} from './reference-data'
 import { ReferenceGuide } from './reference-guide'
 import { ErrorState, Loading, PageHeading } from './shared'
 import type { Endpoint, ReferenceSchema } from './types'
@@ -57,7 +65,7 @@ export function ApiReference() {
   const active = localized.find((e) => `api${e.path}` === hash)
   const guide = referenceGuides.find((g) => g.id === hash)?.id || 'start'
   const endpoints = localized.filter((e) =>
-    `${e.name} ${e.path} ${e.scope} ${e.documentation?.group || ''}`
+    `${e.method || 'GET'} ${e.name} ${e.path} ${e.scope} ${e.documentation?.group || ''}`
       .toLowerCase()
       .includes(search.trim().toLowerCase())
   )
@@ -86,7 +94,7 @@ export function ApiReference() {
           </Button>
         }
       />
-      <div className='reference-layout reference-v2'>
+      <div className='reference-layout reference-v2 reference-v3'>
         <aside className='api-list'>
           <div className='search-field'>
             <Search size={16} />
@@ -107,7 +115,9 @@ export function ApiReference() {
             )}
           </div>
           <nav className='api-list-scroll' aria-label={translate('文档目录')}>
-            <p className='reference-nav-title'>{translate('接入指南')}</p>
+            <p className='nav-caption reference-nav-title'>
+              {translate('接入指南')}
+            </p>
             {referenceGuides.map((g) => (
               <Link
                 key={g.id}
@@ -115,15 +125,35 @@ export function ApiReference() {
                 activeOptions={{ includeHash: true }}
                 hash={g.id}
                 aria-current={!active && g.id === guide ? 'page' : undefined}
-                className={`api-item reference-guide-item${!active && g.id === guide ? ' selected' : ''}`}
+                className={`api-item nav-item reference-guide-item${!active && g.id === guide ? ' selected active' : ''}`}
               >
+                <BookOpen size={17} aria-hidden='true' />
                 <span>{translate(g.title)}</span>
               </Link>
             ))}
             <div className='reference-nav-divider' />
+            <div className='reference-directory-heading'>
+              <span>{translate('接口目录')}</span>
+              <span aria-live='polite'>
+                {endpoints.length} / {localized.length}
+              </span>
+            </div>
             {groups.map((group) => (
-              <div key={group}>
-                <p className='reference-nav-title'>{group}</p>
+              <details key={group} className='reference-nav-group' open>
+                <summary className='nav-caption'>
+                  <ChevronRight
+                    className='reference-disclosure-icon'
+                    size={14}
+                    aria-hidden='true'
+                  />
+                  {group}
+                  <span>
+                    {
+                      endpoints.filter((e) => e.documentation?.group === group)
+                        .length
+                    }
+                  </span>
+                </summary>
                 {endpoints
                   .filter(
                     (e) =>
@@ -136,16 +166,17 @@ export function ApiReference() {
                       to='/api-reference'
                       activeOptions={{ includeHash: true }}
                       hash={`api${e.path}`}
-                      className={`api-item${e.path === active?.path ? ' selected' : ''}`}
+                      className={`api-item nav-item${e.path === active?.path ? ' selected active' : ''}`}
+                      title={`${e.method || 'GET'} /v1${e.path}`}
                       aria-current={
                         e.path === active?.path ? 'page' : undefined
                       }
                     >
+                      <FileText size={17} aria-hidden='true' />
                       <span>{e.name}</span>
-                      <code>GET {e.path}</code>
                     </Link>
                   ))}
-              </div>
+              </details>
             ))}
             {!endpoints.length && (
               <p className='reference-empty' role='status'>
@@ -187,7 +218,7 @@ export function ApiReference() {
           )}
           <footer className='reference-footer'>
             <BookOpen size={15} />
-            <span>{translate('API v1 · 只读校园接口')}</span>
+            <span>{translate('API v1 · 校园服务接口')}</span>
             <a
               href={`/openapi.json?lang=${currentLanguage()}`}
               download='lazycampus-openapi.json'
@@ -234,6 +265,11 @@ function SchemaFields({
             {children.length > 0 && child && (
               <details open={depth === 0 && name === 'data'}>
                 <summary>
+                  <ChevronRight
+                    className='reference-disclosure-icon'
+                    size={14}
+                    aria-hidden='true'
+                  />
                   {translate('查看 ')}
                   {children.length}
                   {translate(' 个字段')}
@@ -269,21 +305,12 @@ function EndpointReference({
   useLocale()
   const doc = e.documentation
   const [values, setValues] = useState<Record<string, string>>({})
-  const query = new URLSearchParams(
-    Object.entries(values).filter(([, value]) => value !== '')
+  const [body, setBody] = useState(
+    JSON.stringify(doc?.request_example || {}, null, 2)
   )
-  const path = `/v1${e.path}${query.size ? `?${query.toString()}` : ''}`
-  const exampleQuery = new URLSearchParams(
-    e.parameters.flatMap((p) => {
-      const value =
-        values[p.name] ||
-        (p.required
-          ? String(doc?.parameters[p.name]?.example ?? p.example ?? '')
-          : '')
-      return value ? [[p.name, value]] : []
-    })
-  )
-  const examplePath = `/v1${e.path}${exampleQuery.size ? `?${exampleQuery}` : ''}`
+  const path = endpointPath(e, values)
+  const examplePath = endpointPath(e, values, true)
+  const method = e.method || 'GET'
   const binary =
     doc?.content_type !== undefined && doc.content_type !== 'application/json'
   return (
@@ -292,7 +319,9 @@ function EndpointReference({
       <h2>{e.name}</h2>
       <p className='reference-lead'>{doc?.summary || e.description}</p>
       <div className='endpoint-heading'>
-        <span className='method-badge'>GET</span>
+        <span className='method-badge' data-method={method}>
+          {method}
+        </span>
         <code>/v1{e.path}</code>
         <CopyButton value={`${apiOrigin}/v1${e.path}`} />
       </div>
@@ -333,6 +362,26 @@ function EndpointReference({
         </Link>
         {translate('。')}
       </p>
+      <nav className='reference-page-nav' aria-label={translate('本页目录')}>
+        {[
+          ['reference-parameters', '请求参数'],
+          ['reference-examples', '调用示例'],
+          ['reference-response', '返回字段'],
+          ['reference-explorer', '在线调试'],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            type='button'
+            onClick={() => {
+              const section = document.querySelector<HTMLElement>(`#${id}`)
+              section?.focus({ preventScroll: true })
+              section?.scrollIntoView({ block: 'start' })
+            }}
+          >
+            {translate(label)}
+          </button>
+        ))}
+      </nav>
       {doc && doc.notes.length > 0 && (
         <>
           <h3>{translate('调用说明')}</h3>
@@ -349,7 +398,9 @@ function EndpointReference({
           <p>{e.description}</p>
         </details>
       )}
-      <h3>{translate('查询参数')}</h3>
+      <h3 id='reference-parameters' tabIndex={-1}>
+        {translate('请求参数')}
+      </h3>
       {e.parameters.length ? (
         <div className='reference-table-wrap'>
           <table>
@@ -367,6 +418,11 @@ function EndpointReference({
                   <tr key={p.name}>
                     <td>
                       <code>{p.name}</code>
+                      <span className='reference-parameter-detail'>
+                        {e.path.includes(`{${p.name}}`)
+                          ? translate('路径参数')
+                          : translate('查询参数')}
+                      </span>
                       <span
                         className={
                           p.required
@@ -421,52 +477,79 @@ function EndpointReference({
           {translate('无需查询参数，仅需携带 Authorization 请求头。')}
         </p>
       )}
-      <h3>{translate('请求示例')}</h3>
-      <p>
-        {translate(
-          '示例从环境变量读取密钥；必填参数中的示例标识需替换为自己的查询结果。下方输入参数后，示例会同步更新。'
-        )}
-      </p>
-      <RequestExample path={examplePath} binary={binary} />
-      <h3>{translate('成功响应')}</h3>
-      {binary && (
-        <p className='reference-callout'>
-          {translate('HTTP 200 返回原始')}
-          {doc?.content_type === 'image/*'
-            ? translate('图片')
-            : translate('文件')}
-          {translate(
-            '字节。读取为 Blob、ArrayBuffer 或字节流，再保存或展示。错误响应仍为 JSON。'
-          )}
-        </p>
+      {doc?.request_schema && (
+        <section className='reference-request-body'>
+          <h3>{translate('JSON 请求体')}</h3>
+          <SchemaFields schema={doc.request_schema} />
+        </section>
       )}
-      {!binary && doc && (
-        <>
-          <p>{translate('以下为演示数据，用于说明响应结构。')}</p>
-          <div className='code-example reference-response-example'>
-            <div>
-              <span>200 · application/json</span>
-              <CopyButton
-                value={JSON.stringify(doc.response_example, null, 2)}
-              />
-            </div>
-            <CodeBlock
-              code={JSON.stringify(doc.response_example, null, 2)}
-              language='json'
-            />
-          </div>
-          <h3>{translate('返回字段')}</h3>
+      <div
+        className='reference-examples-grid'
+        id='reference-examples'
+        tabIndex={-1}
+      >
+        <section className='reference-example-panel'>
+          <h3>{translate('请求示例')}</h3>
           <p>
             {translate(
-              '字段是否为空取决于学校数据；结构化对象可展开查看。未列为固定枚举的文字状态请按原值保留。'
+              '示例从环境变量读取密钥；必填参数中的示例标识需替换为自己的查询结果。下方输入参数后，示例会同步更新。'
             )}
           </p>
-          <SchemaFields schema={doc.response_schema} />
-        </>
-      )}
-      {!binary && !doc && (
-        <p>{translate('JSON 响应包含 success、data 和可选 meta。')}</p>
-      )}
+          <RequestExample
+            path={examplePath}
+            binary={binary}
+            method={method}
+            body={body}
+          />
+        </section>
+        <section className='reference-example-panel'>
+          <h3>{translate('成功响应')}</h3>
+          {binary && (
+            <p className='reference-callout'>
+              {translate('HTTP 200 返回原始')}
+              {doc?.content_type === 'image/*'
+                ? translate('图片')
+                : translate('文件')}
+              {translate(
+                '字节。读取为 Blob、ArrayBuffer 或字节流，再保存或展示。错误响应仍为 JSON。'
+              )}
+            </p>
+          )}
+          {!binary && doc && (
+            <>
+              <p>{translate('以下为演示数据，用于说明响应结构。')}</p>
+              <div className='code-example reference-response-example'>
+                <div>
+                  <span>{doc.success_status || 200} · application/json</span>
+                  <CopyButton
+                    value={JSON.stringify(doc.response_example, null, 2)}
+                  />
+                </div>
+                <CodeBlock
+                  code={JSON.stringify(doc.response_example, null, 2)}
+                  language='json'
+                />
+              </div>
+            </>
+          )}
+          {!binary && !doc && (
+            <p>{translate('JSON 响应包含 success、data 和可选 meta。')}</p>
+          )}
+        </section>
+      </div>
+      <section id='reference-response' tabIndex={-1}>
+        {!binary && doc && (
+          <>
+            <h3>{translate('返回字段')}</h3>
+            <p>
+              {translate(
+                '字段是否为空取决于学校数据；结构化对象可展开查看。未列为固定枚举的文字状态请按原值保留。'
+              )}
+            </p>
+            <SchemaFields schema={doc.response_schema} />
+          </>
+        )}
+      </section>
       <p>
         <Link
           to='/api-reference'
@@ -486,7 +569,9 @@ function EndpointReference({
           <ArrowRight size={13} />
         </Link>
       </p>
-      <h3>{translate('在线调试')}</h3>
+      <h3 id='reference-explorer' tabIndex={-1}>
+        {translate('在线调试')}
+      </h3>
       <p>
         {translate(
           '使用真实密钥发起请求，会计入实际调用额度。密钥仅保留在当前页面内存中，切换接口或刷新后清空。'
@@ -497,6 +582,8 @@ function EndpointReference({
         path={path}
         values={values}
         setValues={setValues}
+        body={body}
+        setBody={setBody}
       />
       {!!doc?.related.length && (
         <>
@@ -527,11 +614,15 @@ function RequestExplorer({
   path,
   values,
   setValues,
+  body,
+  setBody,
 }: {
   endpoint: Endpoint
   path: string
   values: Record<string, string>
   setValues: (values: Record<string, string>) => void
+  body: string
+  setBody: (value: string) => void
 }) {
   useLocale()
   const [key, setKey] = useState('')
@@ -552,10 +643,24 @@ function RequestExplorer({
     setResult(null)
     const started = performance.now()
     try {
+      const post = e.method === 'POST'
+      if (post) {
+        try {
+          const input: unknown = JSON.parse(body)
+          if (!input || Array.isArray(input) || typeof input !== 'object') {
+            throw new Error()
+          }
+        } catch {
+          setError(translate('请输入有效的 JSON 对象。'))
+          return
+        }
+      }
       const response = await fetch(path, {
+        ...(post ? { method: 'POST', body } : {}),
         headers: {
           Authorization: `Bearer ${key.trim()}`,
           'Accept-Language': currentLanguage(),
+          ...(post ? { 'Content-Type': 'application/json' } : {}),
         },
         credentials: 'omit',
         cache: 'no-store',
@@ -648,6 +753,21 @@ function RequestExplorer({
             </label>
           ))}
         </div>
+        {e.method === 'POST' && (
+          <label>
+            {translate('JSON 请求体')}
+            <Textarea
+              aria-label={translate('JSON 请求体')}
+              rows={6}
+              spellCheck={false}
+              value={body}
+              onChange={(event) => setBody(event.target.value)}
+            />
+            <span className='reference-write-note'>
+              {translate('提交将实际开具本人证明；请先核对证明和选项。')}
+            </span>
+          </label>
+        )}
         <Button
           type='submit'
           disabled={

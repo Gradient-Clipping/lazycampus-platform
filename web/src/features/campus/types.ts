@@ -46,6 +46,7 @@ export interface TokenInput {
   enabled: boolean
 }
 export interface Endpoint {
+  method?: 'GET' | 'POST'
   path: string
   name: string
   scope: string
@@ -72,6 +73,9 @@ export interface Endpoint {
     content_type: string
     response_schema: ReferenceSchema
     response_example: unknown
+    request_schema?: ReferenceSchema
+    request_example?: unknown
+    success_status?: number
   }
   parameters: {
     name: string

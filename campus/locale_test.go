@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http/httptest"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -46,10 +47,12 @@ func TestEnglishOpenAPIHasCompleteTranslationsAndIdenticalContract(t *testing.T)
 	require.NoError(t, json.Unmarshal(zh.Body.Bytes(), &chinese))
 	require.NoError(t, json.Unmarshal(en.Body.Bytes(), &englishSpec))
 	enPaths := englishSpec["paths"].(map[string]any)
-	assert.Len(t, enPaths, 18)
+	assert.Len(t, enPaths, len(Catalog))
 	for path, raw := range chinese["paths"].(map[string]any) {
-		before := raw.(map[string]any)["get"].(map[string]any)
-		after := enPaths[path].(map[string]any)["get"].(map[string]any)
+		endpoint, _ := endpointFor(strings.TrimPrefix(path, "/v1"))
+		method := strings.ToLower(endpoint.Method)
+		before := raw.(map[string]any)[method].(map[string]any)
+		after := enPaths[path].(map[string]any)[method].(map[string]any)
 		for _, key := range []string{"operationId", "x-required-scope", "x-service-status", "x-rate-limit-per-minute", "x-daily-quota", "x-cooldown-seconds"} {
 			assert.Equal(t, before[key], after[key], path+" "+key)
 		}
@@ -66,7 +69,7 @@ func TestEnglishOpenAPIHasCompleteTranslationsAndIdenticalContract(t *testing.T)
 			assert.Equal(t, originalSchema, translatedSchema)
 		}
 	}
-	assert.Contains(t, englishSpec["info"].(map[string]any)["description"], "1000 per day")
+	assert.Contains(t, englishSpec["info"].(map[string]any)["description"], "1500 per day")
 	// English exports must not mutate shared Chinese schemas.
 	again := perform(a, "GET", "/openapi.json?lang=zh", "", "", "")
 	assert.Equal(t, zh.Body.String(), again.Body.String())

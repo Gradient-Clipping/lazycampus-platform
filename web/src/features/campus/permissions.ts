@@ -10,6 +10,10 @@ const names: Record<string, string> = {
   'notices:read': '学校通知查询',
   'electricity:read': '寝室电费查询',
   'content:read': '校园公告查询',
+  'companions:read': '伙伴课表查询',
+  'laundry:read': '洗衣查询',
+  'documents:read': '证明查询',
+  'documents:issue': '证明开具',
 }
 
 export function scopeName(scope: string) {

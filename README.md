@@ -68,12 +68,12 @@ Logo 使用质量 0.9 的 WebP，保留原始尺寸；浏览器圆形图标使�
 
 ## 开发者接口文档
 
-[在线文档](https://platform.lazycampus.com/api-reference) 包含快速开始、鉴权与权限、响应与分页、额度与错误处理四篇接入指南，以及 18 个校园接口的参数、字段说明、成功示例、关联流程和在线调试。每个接口有独立链接，例如[课表](https://platform.lazycampus.com/api-reference#api/teaching/timetable)。示例支持 cURL（Bash）、Node.js 和 Python 标准库，密钥从 `LAZYCAMPUS_API_KEY` 环境变量读取。
+[在线文档](https://platform.lazycampus.com/api-reference) 包含四篇接入指南和 32 个接口的参数、字段、示例、关联流程及在线调试。文档页独立使用完整宽度，顶部保留入口；目录支持分组折叠和搜索。每个接口有独立链接，例如[课表](https://platform.lazycampus.com/api-reference#api/teaching/timetable)。示例支持 cURL（Bash）、Node.js 和 Python 标准库，密钥从 `LAZYCAMPUS_API_KEY` 环境变量读取。
 
 - 唯一数据入口为 `https://platform.lazycampus.com/v1`，使用 `Authorization: Bearer <应用密钥>`。控制台的 SSO 会话与开放 API 密钥分别使用。
 - [OpenAPI 3.0.3 契约](https://platform.lazycampus.com/openapi.json) 可导入支持 OpenAPI 的接口工具，包含参数类型、默认值、约束、响应结构、示例、错误和响应头。权限、状态及限流按当前后台配置生成。
 - `campus/catalog.go` 定义允许的路由和查询参数；`campus/reference.json` 保存公共接口的补充契约；`campus/reference.go` 生成 OpenAPI 并向 `/api/catalog` 提供展开的字段结构。前端直接读取同一契约，不另维护一份响应字段表。修改校园数据结构时同步这份契约及对应测试。
-- 文档只包含开放版本允许的参数。`page` 和 `pageSize` 最大均为 100；成绩和考试默认每页 50 条、消息和通知 20 条、空教室 30 条；一次最多查询 5 栋楼。不提供 `refresh`、`automatic`、`waitForSync`、写入日程、绑定寝室或公告媒体下载接口。
+- 文档只包含开放版本允许的参数。`page` 和 `pageSize` 最大均为 100；成绩和考试默认每页 50 条、消息和通知 20 条、空教室 30 条；一次最多查询 5 栋楼。教务不提供强制刷新，洗衣设备及证明目录可使用其明确列出的 `refresh` 参数；不提供写入日程、管理伙伴绑定、绑定寝室或公告媒体下载接口。
 - 校历和通知附件成功时返回二进制；网关最大响应为 16 MiB。附件原文件名从通知正文获取。校园服务透传错误可能使用 `requestId`，网关错误使用 `request_id`；排障统一优先记录 `X-Request-Id` 响应头。
 - 在线调试使用真实密钥并消耗实际额度，不将密钥写入 URL、示例、浏览器持久存储或日志。切换接口或刷新页面后清空；二进制响应显示字节数，下载使用示例代码。
 
@@ -110,11 +110,11 @@ flowchart TD
 
 开放平台存储账号关联、密钥摘要、额度、调用记录、运营配置、通知偏好及设备会话元数据，不保存学校密码或复制校园数据。校园数据由 Easy SWU 共用服务查询。平台通过内部 HMAC 签名传递学校身份，Easy SWU 再通过 Identity Bridge 验证身份状态并读取校园凭据。开发者密钥不会转发给学校系统，也不能替换小程序的设备凭据。
 
-共用查询继续使用已有缓存、持久快照和校园会话。开放 API 不允许强制刷新或修改校园账号绑定，避免用户脚本绕过校园服务的刷新冷却。
+共用查询继续使用已有缓存、持久快照和校园会话。开放平台与小程序共享北京时间“用户当天首次活动”标记，首次调用在响应后由同一协调器后台同步成绩、课表和考试；已有缓存可能先返回旧数据，同步完成后读取新数据，失败保留缓存并释放标记供后续活动重试。没有缓存时沿用小程序的按需查询。教务接口不接受强制刷新参数，洗衣设备和证明目录仅接受各自列出的刷新选项。
 
 ## 接口与权限
 
-以下接口均为 GET，前缀为 `/v1`。所有接口都需要有效学校身份；只能访问密钥所属用户的数据。
+共 32 个接口，前缀为 `/v1`；除证明开具为 POST，其余均为 GET。所有接口都需要有效学校身份；伙伴接口额外检查已有绑定关系。
 
 | 权限 | 接口 |
 | --- | --- |
@@ -125,8 +125,16 @@ flowchart TD
 | messages:read | /teaching/messages |
 | notices:read | /teaching/notices、/teaching/notices/detail、/teaching/notices/attachment |
 | rooms:read | /teaching/rooms/options、/teaching/rooms |
-| electricity:read | /utilities/electricity/account、/utilities/electricity/buildings |
+| electricity:read | /utilities/electricity/account、/utilities/electricity/buildings、/utilities/electricity/details |
 | content:read | /content/feed |
+| companions:read | /teaching/companions、/teaching/companions/{id}/timetable、/teaching/companions/{id}/schedule |
+| laundry:read | /utilities/laundry/campuses、/utilities/laundry/buildings、/utilities/laundry/positions、/utilities/laundry/account、/utilities/laundry/devices |
+| documents:read | /campus-documents/certificates、/campus-documents/certificates/state、/campus-documents/certificates/{id}/options、/campus-documents/files/{id} |
+| documents:issue | POST /campus-documents/certificates/{id}/issue |
+
+伙伴查询不返回伙伴码或待处理申请，不使用伙伴账号主动查询学校；绑定管理仍在小程序完成。洗衣复用小程序的共享缓存和按需刷新；电费历史复用原有绑定和近 30 天明细补齐逻辑。
+
+证明开具流程：读取目录和选项 → POST JSON `{ "selected": {} }`（有选项时填写选项 ID 到值的映射）→ 接收 HTTP 202 与 `jobId` → 至少间隔 2 秒查询状态 → 下载本人已发布、未过期的 PDF。文件默认保留 24 小时；运行中的同类任务会复用，完成后再次提交会重新开具。`documents:issue` 必须显式授权，已有密钥不会自动取得新权限。PDF 最大 20 MiB，其他响应最大 16 MiB。
 
 学期、学年、楼栋、节次等选项从接口返回结果读取，不应在应用中硬编码。寝室电费使用本人已在小程序绑定的寝室。接口参数见在线文档；返回数据结构与 Easy SWU 对应查询接口保持一致，JSON 使用 `success`、`data` 和可选的 `meta`。校历图片和通知附件返回二进制。
 
@@ -143,20 +151,18 @@ curl --fail-with-body \
 
 | 规则 | 默认值 |
 | --- | --- |
-| 用户每日额度 | 1,000 次，所有应用共享 |
-| 用户调用速率 | 20 次/分钟，突发不超过 10 次/秒 |
-| 新应用每日额度 | 1,000 次 |
-| 新应用速率 | 20 次/分钟 |
+| 用户每日额度 | 1,500 次，所有应用共享 |
+| 用户调用速率 | 30 次/分钟，突发不超过 10 次/秒 |
+| 新应用每日额度 | 1,500 次 |
+| 新应用速率 | 30 次/分钟 |
 | 新应用总额度 / 有效期 | 100,000 次 / 90 天，可选「长期」，额度仍然有效 |
 | 并发 | 每用户 3 个、全平台 20 个在途请求 |
-| 查询冷却 | 空教室和成绩分布 10 秒，通过率 5 秒，附件 3 秒，通知正文 2 秒 |
+| 查询冷却 | 空教室、证明开具 10 秒；电费历史、洗衣设备、证明目录 5 秒；附件 3 秒；通知正文、证明状态及 PDF 下载 2 秒；课程通过率、班级成绩分布无冷却 |
 | 查询上限 | 每页最多 100 条、最多 100 页、每次最多 5 栋楼 |
 
 每日额度在 UTC 00:00 重置，控制台按用户本地时区显示重置时间。权限或参数校验失败、额度拒绝不消耗次数；已接纳的校园查询计入额度，包括上游错误。删除、新建或轮换应用不会重置用户每日额度。
 
-升级时会将原默认 60 次/分钟的账户及其超出 20 次/分钟的应用迁移为 20 次/分钟。迁移只执行一次；其他自定义限制和之后的管理员调整保持有效。
-
-本次升级将全站默认日额度从 2,000 调整为 1,000，跟随默认的账户及其较高的应用日额度同步调整；原默认接口日额度也调整为 1,000。较低的应用限制和自定义账户额度保持不变。已使用次数不会清零；如果当天已超过新额度，次日重置后可继续调用。18 个接口平均约可每天各调用 55 次；额度按实际请求累计，不为每个接口单独分配。应用总额度可勾选“无限”（存储和控制台接口以 `quota: 0` 表示）；累计用量仍记录，每日额度、每分钟限流、并发、权限和有效期继续生效。
+本次升级将原默认每日 1,000 次、每分钟 20 次调整为每日 1,500 次、每分钟 30 次；跟随默认的账户、对应默认应用及默认接口限制通过一次性迁移更新，显式自定义限制及之后的管理员修改保留。课程通过率和班级成绩分布的冷却取消。已用额度不会清零，次数按实际请求累计，不按接口平分。应用总额度可勾选“无限”（`quota: 0`）；日额度、每分钟限流、并发、权限和有效期继续生效。
 
 - `401`：密钥无效、已轮换、停用或过期。
 - `403`：接口权限不足、IP 不允许或学校身份不可用。

@@ -44,7 +44,7 @@ func migrateOperations(db *gorm.DB) error {
 			}
 		}
 		for _, endpoint := range Catalog {
-			row := EndpointPolicy{Path: endpoint.Path, Name: endpoint.Name, Scope: endpoint.Scope, Description: endpoint.Description, Status: "operational", RateLimit: 20, DailyQuota: DefaultDailyQuota, Cooldown: endpoint.Cooldown}
+			row := EndpointPolicy{Path: endpoint.Path, Name: endpoint.Name, Scope: endpoint.Scope, Description: endpoint.Description, Status: "operational", RateLimit: DefaultRateLimit, DailyQuota: DefaultDailyQuota, Cooldown: endpoint.Cooldown}
 			if err := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&row).Error; err != nil {
 				return err
 			}
@@ -53,6 +53,9 @@ func migrateOperations(db *gorm.DB) error {
 			return err
 		}
 		if err := migrateDailyQuota1000(tx); err != nil {
+			return err
+		}
+		if err := migrateCampusServiceLimits(tx); err != nil {
 			return err
 		}
 		result := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&Setting{Name: "migration.operations.v1", Value: "complete"})
@@ -266,6 +269,9 @@ func (a *App) catalog(c *gin.Context) {
 	for i := range entries {
 		doc := reference.Endpoints[entries[i].Path]
 		doc.ResponseSchema = expandReference(doc.ResponseSchema).(map[string]any)
+		if len(doc.RequestSchema) > 0 {
+			doc.RequestSchema = expandReference(doc.RequestSchema).(map[string]any)
+		}
 		entries[i].Documentation = &doc
 	}
 	success(c, entries)

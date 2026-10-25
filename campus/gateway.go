@@ -1,10 +1,12 @@
 package campus
 
 import (
+	"bytes"
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"io"
 	"mime"
@@ -22,9 +24,9 @@ import (
 
 func (a *App) gateway(c *gin.Context) {
 	started := time.Now()
-	entry := Log{RequestID: c.GetString("requestID"), Endpoint: "/unknown", Method: "GET", ClientIP: c.ClientIP()}
+	entry := Log{RequestID: c.GetString("requestID"), Endpoint: "/unknown", Method: c.Request.Method, ClientIP: c.ClientIP()}
 	defer func() { a.recordRequest(c, &entry, started) }()
-	endpoint, ok := endpointFor(c.Param("path"))
+	endpoint, ok := requestEndpoint(c.Request.Method, c.Param("path"))
 	if !ok {
 		failure(c, 404, "ENDPOINT_NOT_FOUND", "接口不存在")
 		return
@@ -85,6 +87,11 @@ func (a *App) gateway(c *gin.Context) {
 		failure(c, 400, "INVALID_QUERY", err.Error())
 		return
 	}
+	body, err := gatewayBody(c, endpoint)
+	if err != nil {
+		failure(c, 400, "INVALID_BODY", err.Error())
+		return
+	}
 	release, ok := a.apiRate(c, user, token, endpoint, endpointPolicy)
 	if !ok {
 		return
@@ -111,7 +118,7 @@ func (a *App) gateway(c *gin.Context) {
 		return
 	}
 	c.Header("X-Quota-Remaining", strconv.FormatInt(remaining, 10))
-	path := "/internal/platform/v1" + endpoint.Path
+	path := "/internal/platform/v1" + c.Param("path")
 	query := c.Request.URL.Query().Encode()
 	target := path
 	if query != "" {
@@ -119,14 +126,14 @@ func (a *App) gateway(c *gin.Context) {
 	}
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 85*time.Second)
 	defer cancel()
-	request, err := http.NewRequestWithContext(ctx, "GET", a.Config.CampusURL+target, nil)
+	request, err := http.NewRequestWithContext(ctx, c.Request.Method, a.Config.CampusURL+target, bytes.NewReader(body))
 	if err != nil {
 		failure(c, 502, "UPSTREAM_UNAVAILABLE", "校园服务暂时不可用")
 		return
 	}
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	nonce := randomKey(24)
-	canonical := strings.Join([]string{"GET", target, timestamp, nonce, user.IdentityID, digest("")}, "\n")
+	canonical := strings.Join([]string{c.Request.Method, target, timestamp, nonce, user.IdentityID, digest(string(body))}, "\n")
 	mac := hmac.New(sha256.New, []byte(a.Config.CampusSecret))
 	mac.Write([]byte(canonical))
 	request.Header.Set("X-Platform-Timestamp", timestamp)
@@ -134,6 +141,9 @@ func (a *App) gateway(c *gin.Context) {
 	request.Header.Set("X-Platform-Identity", user.IdentityID)
 	request.Header.Set("X-Platform-Signature", hex.EncodeToString(mac.Sum(nil)))
 	request.Header.Set("X-Request-Id", entry.RequestID)
+	if c.Request.Method == "POST" {
+		request.Header.Set("Content-Type", "application/json")
+	}
 	response, err := a.HTTP.Do(request)
 	if err != nil {
 		failure(c, 502, "UPSTREAM_UNAVAILABLE", "校园服务暂时不可用，请稍后重试")
@@ -153,12 +163,18 @@ func (a *App) gateway(c *gin.Context) {
 	contentType := response.Header.Get("Content-Type")
 	mediaType, _, _ := mime.ParseMediaType(contentType)
 	// Notifications may contain HTML; serve all non-JSON/image content as downloads.
-	if mediaType != "application/json" && !strings.HasPrefix(mediaType, "image/") {
+	pdf := endpoint.Path == "/campus-documents/files/{id}" && mediaType == "application/pdf"
+	if mediaType != "application/json" && !strings.HasPrefix(mediaType, "image/") && !pdf {
 		contentType = "application/octet-stream"
 		c.Header("Content-Disposition", "attachment")
 	}
-	body, err := io.ReadAll(io.LimitReader(response.Body, 16*1024*1024+1))
-	if err != nil || len(body) > 16*1024*1024 {
+	maxBytes := int64(16 * 1024 * 1024)
+	if pdf {
+		maxBytes = 20 * 1024 * 1024
+		c.Header("Content-Disposition", "attachment")
+	}
+	body, err = io.ReadAll(io.LimitReader(response.Body, maxBytes+1))
+	if err != nil || int64(len(body)) > maxBytes {
 		failure(c, 502, "RESPONSE_TOO_LARGE", "响应超出大小限制")
 		return
 	}
@@ -239,12 +255,12 @@ func validateQuery(query url.Values, e Endpoint) error {
 		if len(values) != 1 || len(values[0]) > 1024 {
 			return errors.New("查询参数无效")
 		}
-		if !slices.ContainsFunc(e.Parameters, func(p Parameter) bool { return p.Name == key }) {
+		if !slices.ContainsFunc(e.Parameters, func(p Parameter) bool { return p.Name == key && e.parameterIn(p) == "query" }) {
 			return errors.New("不支持的查询参数：" + key)
 		}
 	}
 	for _, p := range e.Parameters {
-		if p.Required && query.Get(p.Name) == "" {
+		if p.Required && e.parameterIn(p) == "query" && query.Get(p.Name) == "" {
 			return errors.New("缺少参数：" + p.Name)
 		}
 	}
@@ -260,4 +276,49 @@ func validateQuery(query url.Values, e Endpoint) error {
 		return errors.New("每次最多查询 5 栋楼")
 	}
 	return nil
+}
+
+func gatewayBody(c *gin.Context, e Endpoint) ([]byte, error) {
+	raw, err := io.ReadAll(io.LimitReader(c.Request.Body, 32*1024+1))
+	if err != nil || len(raw) > 32*1024 {
+		return nil, errors.New("请求体超出大小限制")
+	}
+	if e.Method != "POST" {
+		if len(raw) != 0 {
+			return nil, errors.New("GET 请求不接受请求体")
+		}
+		return nil, nil
+	}
+	mediaType, _, _ := mime.ParseMediaType(c.GetHeader("Content-Type"))
+	if mediaType != "application/json" {
+		return nil, errors.New("请求体必须为 application/json")
+	}
+	var input struct {
+		Selected json.RawMessage `json:"selected"`
+	}
+	decoder := json.NewDecoder(bytes.NewReader(raw))
+	decoder.DisallowUnknownFields()
+	if decoder.Decode(&input) != nil || decoder.Decode(new(any)) != io.EOF {
+		return nil, errors.New("证明选项必须为 JSON 对象，最多 20 项")
+	}
+	if bytes.Equal(bytes.TrimSpace(raw), []byte("null")) {
+		return nil, errors.New("请求体必须为 JSON 对象")
+	}
+	selected := map[string]any{}
+	if len(input.Selected) > 0 && (json.Unmarshal(input.Selected, &selected) != nil || selected == nil) {
+		return nil, errors.New("证明选项必须为 JSON 对象，最多 20 项")
+	}
+	if len(selected) > 20 {
+		return nil, errors.New("证明选项必须为 JSON 对象，最多 20 项")
+	}
+	for key, rawValue := range selected {
+		value, ok := rawValue.(string)
+		if !ok {
+			return nil, errors.New("证明选项必须为 JSON 对象，最多 20 项")
+		}
+		if len([]rune(key)) > 100 || len([]rune(value)) > 100 {
+			return nil, errors.New("证明选项最多 100 字符")
+		}
+	}
+	return raw, nil
 }

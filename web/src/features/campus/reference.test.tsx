@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-router'
 import {
   cleanup,
+  fireEvent,
   render,
   screen,
   waitFor,
@@ -19,7 +20,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import i18n from '@/i18n/config'
 
 import { ApiReference } from './reference'
-import { requestExample } from './reference-data'
+import { requestExample, endpointPath } from './reference-data'
 import type { Endpoint } from './types'
 
 const backend = vi.hoisted(() => ({ request: vi.fn() }))
@@ -92,6 +93,109 @@ const endpoints: Endpoint[] = [
     },
   },
 ]
+
+const issueEndpoint: Endpoint = {
+  ...endpoints[0],
+  method: 'POST',
+  path: '/campus-documents/certificates/{id}/issue',
+  name: '开具证明',
+  scope: 'documents:issue',
+  parameters: [{ name: 'id', required: true, description: '证明标识' }],
+  documentation: {
+    notes: [],
+    content_type: 'application/json',
+    response_schema: {
+      type: 'object',
+      properties: {
+        data: { type: 'object', properties: { jobId: { type: 'string' } } },
+      },
+    },
+    group: '校园证明',
+    summary: '提交本人证明开具任务。',
+    parameters: {
+      id: {
+        description: '证明标识',
+        schema: { type: 'string' },
+        example: 'transcript',
+      },
+    },
+    related: [],
+    request_schema: {
+      type: 'object',
+      properties: {
+        selected: { type: 'object', additionalProperties: { type: 'string' } },
+      },
+    },
+    request_example: { selected: {} },
+    success_status: 202,
+    response_example: { success: true, data: { jobId: 'job-1' } },
+  },
+}
+
+it('submits certificate JSON with a path ID, shows 202 and validates malformed bodies locally', async () => {
+  backend.request.mockResolvedValue([issueEndpoint])
+  const user = userEvent.setup()
+  const fetch = vi
+    .fn()
+    .mockResolvedValue(
+      new Response(
+        JSON.stringify({ success: true, data: { jobId: 'job-1' } }),
+        { status: 202, headers: { 'Content-Type': 'application/json' } }
+      )
+    )
+  vi.stubGlobal('fetch', fetch)
+  view(`api${issueEndpoint.path}`)
+  expect(await screen.findByRole('heading', { name: '开具证明' })).toBeVisible()
+  expect(screen.getByText('documents:issue')).toBeVisible()
+  await user.type(screen.getByLabelText('应用密钥'), 'lc_TEST_ISSUE_KEY')
+  await user.type(
+    screen.getByRole('textbox', { name: 'id *' }),
+    'transcript-123'
+  )
+  const body = '{"selected":{"language":"中文<test>"}}'
+  fireEvent.change(screen.getByLabelText('JSON 请求体'), {
+    target: { value: body },
+  })
+  await user.click(screen.getByRole('button', { name: '发送请求' }))
+  expect(await screen.findByText('HTTP 202')).toBeVisible()
+  expect(fetch).toHaveBeenCalledWith(
+    '/v1/campus-documents/certificates/transcript-123/issue',
+    expect.objectContaining({
+      method: 'POST',
+      body,
+      credentials: 'omit',
+      headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+    })
+  )
+  expect(document.querySelector('.reference-code pre')?.textContent).toContain(
+    '-X POST'
+  )
+  fireEvent.change(screen.getByLabelText('JSON 请求体'), {
+    target: { value: '[]' },
+  })
+  await user.click(screen.getByRole('button', { name: '发送请求' }))
+  expect(await screen.findByText('请输入有效的 JSON 对象。')).toBeVisible()
+  expect(fetch).toHaveBeenCalledTimes(1)
+})
+
+it('keeps dynamic resource IDs in the path and safely quotes POST examples', () => {
+  expect(endpointPath(issueEndpoint, { id: 'a/b' })).toBe(
+    '/v1/campus-documents/certificates/a%2Fb/issue'
+  )
+  expect(endpointPath(issueEndpoint, {}, true)).toBe(
+    '/v1/campus-documents/certificates/transcript/issue'
+  )
+  const body = JSON.stringify({ selected: { name: "O'Brien" } })
+  expect(requestExample('/v1/issue', false, 'bash', 'POST', body)).toContain(
+    `O'"'"'Brien`
+  )
+  expect(
+    requestExample('/v1/issue', false, 'javascript', 'POST', body)
+  ).toContain("method: 'POST'")
+  expect(requestExample('/v1/issue', false, 'python', 'POST', body)).toContain(
+    "method='POST'"
+  )
+})
 
 beforeEach(async () => {
   backend.request.mockResolvedValue(endpoints)

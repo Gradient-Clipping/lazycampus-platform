@@ -3,6 +3,7 @@
   overflow: visible;
   align-items: start;
 }
+
 .reference-v2 .api-list {
   position: sticky;
   top: 88px;
@@ -600,5 +601,278 @@
   }
   .reference-base code {
     font-size: 11px;
+  }
+}
+
+/* A compact directory and clearly separated request/response reading areas. */
+.reference-shell .platform-body {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.reference-shell .platform-main {
+  max-width: none;
+  padding: 24px 16px 36px;
+}
+.reference-v3 {
+  grid-template-columns: 208px minmax(0, 1fr);
+  gap: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.reference-v3 .api-list {
+  background: transparent;
+  border-right: 0;
+  padding: 0 16px 16px 0;
+}
+.reference-v3 .api-document {
+  max-width: 1400px;
+  padding: clamp(24px, 3vw, 44px);
+}
+.reference-directory-heading,
+.reference-nav-group > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+.reference-directory-heading {
+  color: var(--muted-foreground);
+  font-size: 11px;
+  padding-bottom: 6px;
+}
+.reference-directory-heading > span:last-child,
+.reference-nav-group > summary > span {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+}
+.reference-nav-group > summary {
+  cursor: pointer;
+  list-style: none;
+}
+.reference-v3 summary {
+  list-style: none;
+}
+.reference-v3 summary::-webkit-details-marker {
+  display: none;
+}
+.reference-disclosure-icon {
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+details[open] > summary > .reference-disclosure-icon {
+  transform: rotate(90deg);
+}
+.reference-nav-group > summary > span {
+  margin-left: auto;
+}
+.reference-v3 .api-item {
+  display: flex;
+  align-items: center;
+  margin: 0 0 6px;
+  border-radius: 12px;
+  padding: 8px 10px;
+  gap: 10px;
+}
+.reference-v3 .api-item > span {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.reference-v3 .api-item > svg {
+  flex: none;
+}
+.reference-v3 .reference-nav-title {
+  margin: 25px 8px 10px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.reference-v3 .reference-nav-group > summary {
+  margin: 25px 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.reference-v3 .api-item code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 10px;
+  line-height: 1.65;
+  opacity: 0.8;
+}
+.reference-v3 [data-method='POST'] {
+  color: #a75d16;
+}
+.dark .reference-v3 [data-method='POST'] {
+  color: #efbb77;
+}
+.reference-v3 .api-item b {
+  font-size: 9px;
+  font-weight: 650;
+}
+.reference-v3 .api-item.selected {
+  box-shadow: none;
+  border-radius: 14px;
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+.reference-v3 .api-list-scroll {
+  padding: 2px;
+}
+.reference-v3 .endpoint-heading {
+  align-items: flex-start;
+  gap: 12px;
+  padding: 17px;
+}
+.reference-v3 .endpoint-heading > code {
+  overflow-wrap: anywhere;
+  min-width: 0;
+  line-height: 1.7;
+}
+.reference-v3 .endpoint-heading > button {
+  margin-left: auto;
+  flex: none;
+}
+.reference-page-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 26px 0;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--background);
+}
+.reference-page-nav button {
+  flex: 1;
+  white-space: nowrap;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.reference-page-nav button:focus-visible {
+  color: var(--foreground);
+  background: var(--secondary);
+}
+.reference-v3 [id^='reference-'] {
+  scroll-margin-top: 110px;
+}
+.reference-v3 .api-document h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 30px 0 14px;
+  letter-spacing: -0.015em;
+}
+.reference-examples-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 32px 0;
+}
+.reference-example-panel {
+  min-width: 0;
+  padding: 0;
+}
+.reference-v3 .reference-example-panel > h3 {
+  margin-top: 0;
+}
+.reference-example-panel > p {
+  font-size: 12px;
+  line-height: 1.85;
+  color: var(--muted-foreground);
+  margin: 10px 0;
+}
+.reference-v3 .reference-example-panel .syntax-code {
+  max-height: 520px;
+  padding: 16px;
+  font-size: 11px;
+}
+.reference-v3 .reference-fields {
+  background: var(--background);
+}
+.reference-v3 .reference-field {
+  padding: 13px 16px;
+}
+.reference-v3 .reference-field .reference-fields {
+  background: var(--card);
+}
+.reference-write-note {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.reference-request-body {
+  margin-top: 28px;
+}
+.reference-v3 .explorer-form {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px;
+  background: var(--background);
+}
+.reference-v3 .explorer-form textarea {
+  font-family: monospace;
+  font-size: 12px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .reference-page-nav button:hover,
+  .reference-nav-group > summary:hover {
+    background: var(--secondary);
+    color: var(--foreground);
+  }
+}
+@media (max-width: 1450px) {
+  .reference-examples-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 1150px) {
+  .reference-v3 {
+    grid-template-columns: 208px minmax(0, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .reference-v3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .reference-v3 .api-list {
+    position: static;
+    max-height: 280px;
+  }
+  .reference-v3 .api-document {
+    padding: 24px;
+  }
+}
+@media (max-width: 480px) {
+  .reference-shell .platform-body {
+    margin-left: 0;
+  }
+  .reference-shell .platform-main {
+    padding: 24px 16px;
+  }
+  .reference-v3 .api-document {
+    padding: 22px 16px;
+  }
+  .reference-page-nav button {
+    flex: 1 1 40%;
+    padding: 8px;
+  }
+  .reference-example-panel {
+    padding: 14px;
+  }
+  .reference-v3 .explorer-form {
+    padding: 16px;
   }
 }

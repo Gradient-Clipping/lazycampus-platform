@@ -9,13 +9,17 @@ import { requestExample, type ExampleLanguage } from './reference-data'
 export function RequestExample({
   path,
   binary = false,
+  method = 'GET',
+  body,
 }: {
   path: string
   binary?: boolean
+  method?: string
+  body?: string
 }) {
   useLocale()
   const [language, setLanguage] = useState<ExampleLanguage>('bash')
-  const code = requestExample(path, binary, language)
+  const code = requestExample(path, binary, language, method, body)
   return (
     <div className='code-example reference-code'>
       <div>

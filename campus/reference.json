@@ -1977,6 +1977,38 @@
               "done": {
                 "type": "boolean",
                 "description": "是否完成"
+              },
+              "recurrence": {
+                "type": "object",
+                "description": "重复日程分组、周起始日期及排除日期。",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "groupId": {
+                    "type": "string"
+                  },
+                  "weekdays": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "weekStarts": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "date"
+                    }
+                  },
+                  "excludedDates": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "date"
+                    }
+                  }
+                }
               }
             }
           }
@@ -1986,6 +2018,114 @@
           "description": "小程序最后保存时间",
           "format": "date-time",
           "nullable": true
+        },
+        "courses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "本人保存的自定义课程；实际发生日期优先于重复周次。",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "semesterId": {
+                "type": "string"
+              },
+              "groupId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "teacher": {
+                "type": "string"
+              },
+              "weekday": {
+                "type": "integer"
+              },
+              "weekdays": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "periods": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "weeks": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "occurrences": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              },
+              "excludedOccurrences": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              },
+              "excludedDates": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "date"
+                }
+              },
+              "range": {
+                "type": "object",
+                "properties": {
+                  "after": {
+                    "type": "string",
+                    "description": "数据时间",
+                    "format": "date-time",
+                    "nullable": true
+                  },
+                  "until": {
+                    "type": "string",
+                    "description": "数据时间",
+                    "format": "date-time",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -2074,6 +2214,9 @@
                   }
                 }
               }
+            },
+            "electricityHistory": {
+              "$ref": "#/components/schemas/ElectricityHistory"
             }
           },
           "nullable": true
@@ -2499,6 +2642,1137 @@
         "success",
         "data"
       ]
+    },
+    "Companion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "伙伴姓名"
+        },
+        "studentId": {
+          "type": "string",
+          "description": "学校核验学号",
+          "nullable": true
+        },
+        "studentNumber": {
+          "type": "string",
+          "description": "学校核验学号",
+          "nullable": true
+        },
+        "gender": {
+          "type": "string",
+          "description": "性别；可能省略"
+        }
+      }
+    },
+    "CompanionsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "partners": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Companion"
+              }
+            }
+          }
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
+    },
+    "CompanionTimetableResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "object",
+          "description": "本人课表",
+          "properties": {
+            "semester": {
+              "type": "object",
+              "description": "学期选项；直接使用返回的 id",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "学期标识，例如 2026-1"
+                },
+                "academicYear": {
+                  "type": "integer",
+                  "description": "学年起始年份"
+                },
+                "academicYearLabel": {
+                  "type": "string",
+                  "description": "完整学年，例如 2026-2027"
+                },
+                "term": {
+                  "type": "integer",
+                  "description": "1、2 或 3"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "学期显示名称"
+                }
+              },
+              "nullable": true
+            },
+            "semesters": {
+              "type": "array",
+              "description": "可用学期",
+              "items": {
+                "$ref": "#/components/schemas/Semester"
+              }
+            },
+            "currentSemester": {
+              "type": "object",
+              "description": "当前学期；无法确认时为 null",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "学期标识，例如 2026-1"
+                },
+                "academicYear": {
+                  "type": "integer",
+                  "description": "学年起始年份"
+                },
+                "academicYearLabel": {
+                  "type": "string",
+                  "description": "完整学年，例如 2026-2027"
+                },
+                "term": {
+                  "type": "integer",
+                  "description": "1、2 或 3"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "学期显示名称"
+                },
+                "startDate": {
+                  "type": "string",
+                  "description": "开始日期",
+                  "format": "date"
+                },
+                "endDate": {
+                  "type": "string",
+                  "description": "结束日期",
+                  "format": "date"
+                }
+              },
+              "nullable": true
+            },
+            "semesterCalendar": {
+              "type": "object",
+              "description": "所选学期周次日期映射；无可用数据时为 null",
+              "properties": {
+                "semesterId": {
+                  "type": "string",
+                  "description": "学期标识"
+                },
+                "startDate": {
+                  "type": "string",
+                  "description": "开始日期",
+                  "format": "date"
+                },
+                "endDate": {
+                  "type": "string",
+                  "description": "结束日期",
+                  "format": "date"
+                },
+                "totalWeeks": {
+                  "type": "integer",
+                  "description": "总周数"
+                },
+                "weeks": {
+                  "type": "array",
+                  "description": "实际周次映射",
+                  "items": {
+                    "type": "object",
+                    "description": "周",
+                    "properties": {
+                      "weekNumber": {
+                        "type": "integer",
+                        "description": "周次"
+                      },
+                      "startDate": {
+                        "type": "string",
+                        "description": "周开始",
+                        "format": "date"
+                      },
+                      "endDate": {
+                        "type": "string",
+                        "description": "周结束",
+                        "format": "date"
+                      }
+                    }
+                  }
+                }
+              },
+              "nullable": true
+            },
+            "dataSource": {
+              "type": "string",
+              "description": "teaching_system 或 one_stop"
+            },
+            "sourceTimeZone": {
+              "type": "string",
+              "description": "课程周期时间的来源时区，Asia/Shanghai"
+            },
+            "periods": {
+              "type": "array",
+              "description": "节次",
+              "items": {
+                "$ref": "#/components/schemas/Period"
+              }
+            },
+            "courses": {
+              "type": "array",
+              "description": "网格课程",
+              "items": {
+                "type": "object",
+                "description": "课程",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "课程标识"
+                  },
+                  "courseCode": {
+                    "type": "string",
+                    "description": "课程号"
+                  },
+                  "courseName": {
+                    "type": "string",
+                    "description": "课程名称"
+                  },
+                  "teachingClass": {
+                    "type": "string",
+                    "description": "教学班"
+                  },
+                  "teacherNames": {
+                    "type": "array",
+                    "description": "教师",
+                    "items": {
+                      "type": "string",
+                      "description": "姓名"
+                    }
+                  },
+                  "credits": {
+                    "type": "number",
+                    "description": "学分",
+                    "nullable": true
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "课程类别"
+                  },
+                  "nature": {
+                    "type": "string",
+                    "description": "课程性质"
+                  },
+                  "assessmentMethod": {
+                    "type": "string",
+                    "description": "考核方式"
+                  },
+                  "examMethod": {
+                    "type": "string",
+                    "description": "考试方式"
+                  },
+                  "teachingClassComposition": {
+                    "type": "array",
+                    "description": "教学班组成",
+                    "items": {
+                      "type": "string",
+                      "description": "班级"
+                    }
+                  },
+                  "hours": {
+                    "type": "object",
+                    "description": "课时",
+                    "properties": {
+                      "composition": {
+                        "type": "string",
+                        "description": "课时组成"
+                      },
+                      "weekly": {
+                        "type": "number",
+                        "description": "周课时",
+                        "nullable": true
+                      },
+                      "total": {
+                        "type": "number",
+                        "description": "总课时",
+                        "nullable": true
+                      }
+                    }
+                  },
+                  "retake": {
+                    "type": "boolean",
+                    "description": "是否重修"
+                  },
+                  "selectionStatus": {
+                    "type": "string",
+                    "description": "selected 或 pending"
+                  },
+                  "arrangements": {
+                    "type": "array",
+                    "description": "具体上课安排",
+                    "items": {
+                      "type": "object",
+                      "description": "安排",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "安排标识"
+                        },
+                        "weekday": {
+                          "type": "integer",
+                          "description": "星期一为 1，星期日为 7"
+                        },
+                        "weekdayLabel": {
+                          "type": "string",
+                          "description": "星期名称"
+                        },
+                        "periodStart": {
+                          "type": "integer",
+                          "description": "开始节次"
+                        },
+                        "periodEnd": {
+                          "type": "integer",
+                          "description": "结束节次"
+                        },
+                        "periods": {
+                          "type": "array",
+                          "description": "完整节次",
+                          "items": {
+                            "type": "integer",
+                            "description": "节次"
+                          }
+                        },
+                        "startTime": {
+                          "type": "string",
+                          "description": "学校当地开始时间，HH:mm"
+                        },
+                        "endTime": {
+                          "type": "string",
+                          "description": "学校当地结束时间，HH:mm"
+                        },
+                        "weekText": {
+                          "type": "string",
+                          "description": "周次显示文本"
+                        },
+                        "weeks": {
+                          "type": "array",
+                          "description": "实际周次；计算日期时使用此数组",
+                          "items": {
+                            "type": "integer",
+                            "description": "周次"
+                          }
+                        },
+                        "activityType": {
+                          "type": "string",
+                          "description": "活动类型"
+                        },
+                        "activityTypeLabel": {
+                          "type": "string",
+                          "description": "活动类型名称"
+                        },
+                        "teacherNames": {
+                          "type": "array",
+                          "description": "教师",
+                          "items": {
+                            "type": "string",
+                            "description": "姓名"
+                          }
+                        },
+                        "location": {
+                          "type": "object",
+                          "description": "上课地点",
+                          "properties": {
+                            "campus": {
+                              "type": "string",
+                              "description": "校区"
+                            },
+                            "building": {
+                              "type": "string",
+                              "description": "楼栋"
+                            },
+                            "room": {
+                              "type": "string",
+                              "description": "教室"
+                            },
+                            "display": {
+                              "type": "string",
+                              "description": "显示名称"
+                            }
+                          }
+                        },
+                        "teachingMethod": {
+                          "type": "string",
+                          "description": "教学方式"
+                        },
+                        "selectionStatus": {
+                          "type": "string",
+                          "description": "选课状态"
+                        },
+                        "adjusted": {
+                          "type": "boolean",
+                          "description": "是否调课"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "additionalCourses": {
+              "type": "array",
+              "description": "实践课等非网格课程",
+              "items": {
+                "type": "object",
+                "description": "课程",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "标识"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "类型"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "安排说明"
+                  }
+                }
+              }
+            },
+            "summary": {
+              "type": "object",
+              "description": "课表汇总",
+              "properties": {
+                "courseCount": {
+                  "type": "integer",
+                  "description": "课程数"
+                },
+                "arrangementCount": {
+                  "type": "integer",
+                  "description": "安排数"
+                },
+                "maxWeek": {
+                  "type": "integer",
+                  "description": "最大周次"
+                }
+              }
+            }
+          },
+          "nullable": true
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
+    },
+    "ElectricityHistory": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer"
+        },
+        "complete": {
+          "type": "boolean",
+          "description": "历史是否已完整加载"
+        },
+        "sourceTimeZone": {
+          "type": "string"
+        },
+        "fromDate": {
+          "type": "string",
+          "format": "date",
+          "nullable": true
+        },
+        "throughDate": {
+          "type": "string",
+          "format": "date",
+          "nullable": true
+        },
+        "fetchedAt": {
+          "type": "string",
+          "description": "数据时间",
+          "format": "date-time",
+          "nullable": true
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "billedElectricityKwh": {
+                "type": "number",
+                "description": "计费电量，kWh"
+              },
+              "remainingAmountYuan": {
+                "type": "number",
+                "description": "当日剩余金额，元"
+              },
+              "dailySpendingYuan": {
+                "type": "number",
+                "description": "当日支出金额，元"
+              },
+              "totalElectricityKwh": {
+                "type": "number",
+                "description": "总用电量，kWh"
+              }
+            }
+          }
+        }
+      }
+    },
+    "LaundryCampus": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "number"
+        },
+        "latitude": {
+          "type": "number"
+        },
+        "address": {
+          "type": "string"
+        }
+      }
+    },
+    "LaundryPosition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "shopId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sourceName": {
+          "type": "string"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "categoryCodes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "LaundryBuilding": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "campus": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "LaundryDevice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "description": "规范化设备名称"
+        },
+        "sourceName": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "washer",
+            "dryer"
+          ]
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "idle",
+            "occupied",
+            "fault",
+            "unknown"
+          ]
+        },
+        "stateName": {
+          "type": "string",
+          "description": "设备状态文字"
+        },
+        "floor": {
+          "type": "string",
+          "nullable": true
+        },
+        "number": {
+          "type": "number",
+          "nullable": true
+        },
+        "expectedFinishAt": {
+          "type": "string",
+          "description": "数据时间",
+          "format": "date-time",
+          "nullable": true
+        },
+        "remainingSeconds": {
+          "type": "number",
+          "description": "预计剩余秒数；未知时为 null",
+          "nullable": true
+        },
+        "remainingMinutes": {
+          "type": "number",
+          "description": "预计剩余分钟数",
+          "nullable": true
+        },
+        "fetchedAt": {
+          "type": "string",
+          "description": "数据时间",
+          "format": "date-time",
+          "nullable": true
+        },
+        "stale": {
+          "type": "boolean"
+        }
+      }
+    },
+    "LaundryCampusesResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "campuses": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/LaundryCampus"
+              }
+            }
+          }
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
+    },
+    "LaundryBuildingsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "campus": {
+              "type": "string"
+            },
+            "buildings": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/LaundryBuilding"
+              }
+            }
+          }
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
+    },
+    "LaundryPositionsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "campus": {
+              "type": "string"
+            },
+            "positions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/LaundryPosition"
+              }
+            }
+          }
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
+    },
+    "LaundryAccountResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "binding": {
+              "type": "object",
+              "nullable": true,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "campus": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "aliases": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "roomNumber": {
+                  "type": "string"
+                },
+                "boundAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "changedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true
+                },
+                "source": {
+                  "type": "string"
+                },
+                "independent": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "electricitySuggestion": {
+              "type": "object",
+              "nullable": true,
+              "additionalProperties": true
+            },
+            "serverNow": {
+              "type": "string",
+              "description": "数据时间",
+              "format": "date-time",
+              "nullable": true
+            }
+          }
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
+    },
+    "LaundryDevicesResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "campus": {
+              "type": "string"
+            },
+            "query": {
+              "type": "string",
+              "nullable": true
+            },
+            "positions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/LaundryPosition"
+              }
+            },
+            "sourceTimeZone": {
+              "type": "string"
+            },
+            "serverNow": {
+              "type": "string",
+              "description": "数据时间",
+              "format": "date-time",
+              "nullable": true
+            },
+            "refreshing": {
+              "type": "boolean"
+            },
+            "devices": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/LaundryDevice"
+              }
+            },
+            "counts": {
+              "type": "object",
+              "properties": {
+                "washer": {
+                  "type": "integer"
+                },
+                "dryer": {
+                  "type": "integer"
+                },
+                "idle": {
+                  "type": "integer"
+                },
+                "occupied": {
+                  "type": "integer"
+                },
+                "fault": {
+                  "type": "integer"
+                },
+                "unknown": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
+    },
+    "CertificateOption": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "enable": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Certificate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CertificateOption"
+          }
+        }
+      }
+    },
+    "CertificateFile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "文件 UUID"
+        },
+        "certificateId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number",
+          "description": "PDF 文件大小，字节"
+        },
+        "expiresAt": {
+          "type": "string",
+          "description": "数据时间",
+          "format": "date-time",
+          "nullable": true
+        }
+      }
+    },
+    "CertificateJob": {
+      "type": "object",
+      "properties": {
+        "certificateId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "开具任务 UUID"
+        },
+        "progress": {
+          "type": "number",
+          "description": "开具进度百分比"
+        },
+        "running": {
+          "type": "boolean"
+        },
+        "error": {
+          "type": "string",
+          "description": "失败原因；成功或运行中为空字符串"
+        }
+      }
+    },
+    "CertificateCatalogResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "scopeKey": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Certificate"
+              }
+            },
+            "updatedAt": {
+              "type": "string",
+              "description": "数据时间",
+              "format": "date-time",
+              "nullable": true
+            },
+            "files": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/CertificateFile"
+              }
+            },
+            "jobs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/CertificateJob"
+              }
+            },
+            "checkedAt": {
+              "type": "string",
+              "description": "数据时间",
+              "format": "date-time",
+              "nullable": true
+            }
+          }
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
+    },
+    "CertificateStateResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "files": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/CertificateFile"
+              }
+            },
+            "jobs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/CertificateJob"
+              }
+            },
+            "checkedAt": {
+              "type": "string",
+              "description": "数据时间",
+              "format": "date-time",
+              "nullable": true
+            },
+            "catalogVersion": {
+              "type": "object",
+              "properties": {
+                "scopeKey": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "description": "数据时间",
+                  "format": "date-time",
+                  "nullable": true
+                }
+              }
+            }
+          }
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
+    },
+    "CertificateOptionsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/CertificateOption"
+          }
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
+    },
+    "CertificateIssueRequest": {
+      "type": "object",
+      "properties": {
+        "selected": {
+          "type": "object",
+          "description": "选项 ID 到选中值的映射；最多 20 项，每个键和值最多 100 字符。",
+          "maxProperties": 20,
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 100
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "CertificateIssueResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "jobId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "meta": {
+          "$ref": "#/components/schemas/Meta"
+        }
+      }
     }
   },
   "endpoints": {
@@ -2600,7 +3874,8 @@
       "notes": [
         "用 arrangements[].weeks 和 semesterCalendar 映射具体上课日期；weekText 仅用于显示。",
         "周期时间以 sourceTimeZone 为准；转换成完整日期时间后再换算至用户所在时区。",
-        "已有数据可能先返回；meta.stale=true 时显示更新时间，不应将旧数据视为最新。"
+        "已有数据可能先返回；meta.stale=true 时显示更新时间，不应将旧数据视为最新。",
+        "与小程序共用北京时间当天首次活动标记；首次调用会在响应后后台同步成绩、课表和考试。有缓存时可能先返回旧数据，同步完成后的查询读取新数据；失败保留缓存并允许后续活动重试。"
       ],
       "related": [
         "/teaching/schedule",
@@ -2811,7 +4086,8 @@
               "done": false
             }
           ],
-          "clientUpdatedAt": "2026-09-11T08:00:00.000Z"
+          "clientUpdatedAt": "2026-09-11T08:00:00.000Z",
+          "courses": []
         },
         "meta": {
           "cached": true,
@@ -2825,7 +4101,8 @@
       "notes": [
         "finalScore 和分项 score 可以是数字、文字或 null；不要直接 parseFloat。",
         "summary 对全部筛选结果计算，不只是当前页。semesters 来自本人的真实成绩记录。",
-        "每条成绩保留独立 id；同名课程不应仅按课程名合并。"
+        "每条成绩保留独立 id；同名课程不应仅按课程名合并。",
+        "与小程序共用北京时间当天首次活动标记；首次调用会在响应后后台同步成绩、课表和考试。有缓存时可能先返回旧数据，同步完成后的查询读取新数据；失败保留缓存并允许后续活动重试。"
       ],
       "related": [
         "/teaching/grades/class-distribution",
@@ -3115,7 +4392,8 @@
       "summary": "按学期查询本人的正常考试、补考与缓考安排。",
       "notes": [
         "semester 使用考试学期接口返回的 semesters[].id。",
-        "startAt/endAt 带时区；学校未给出确切时间时可能为 null，此时保留 raw 文本。"
+        "startAt/endAt 带时区；学校未给出确切时间时可能为 null，此时保留 raw 文本。",
+        "与小程序共用北京时间当天首次活动标记；首次调用会在响应后后台同步成绩、课表和考试。有缓存时可能先返回旧数据，同步完成后的查询读取新数据；失败保留缓存并允许后续活动重试。"
       ],
       "related": [
         "/teaching/exams/options"
@@ -3235,7 +4513,8 @@
       "group": "考试安排",
       "summary": "获取本人可查询的考试学期与默认学期。",
       "notes": [
-        "无可用学期时 semesters=[]、defaultSemester=null。"
+        "无可用学期时 semesters=[]、defaultSemester=null。",
+        "与小程序共用北京时间当天首次活动标记；首次调用会在响应后后台同步成绩、课表和考试。有缓存时可能先返回旧数据，同步完成后的查询读取新数据；失败保留缓存并允许后续活动重试。"
       ],
       "related": [
         "/teaching/exams"
@@ -3853,6 +5132,585 @@
           "unreadCount": 0
         }
       }
+    },
+    "/teaching/companions": {
+      "group": "伙伴课表",
+      "summary": "读取本人已绑定的伙伴列表。",
+      "notes": [
+        "仅返回已绑定伙伴；绑定和解绑请在小程序完成，不返回伙伴码或待处理申请。"
+      ],
+      "related": [
+        "/teaching/companions/{id}/timetable",
+        "/teaching/companions/{id}/schedule"
+      ],
+      "parameters": {},
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/CompanionsResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "partners": [
+            {
+              "id": 123,
+              "name": "Example",
+              "studentId": "202600000000001",
+              "studentNumber": "202600000000001"
+            }
+          ]
+        }
+      }
+    },
+    "/teaching/companions/{id}/timetable": {
+      "group": "伙伴课表",
+      "summary": "读取已绑定伙伴的课表快照。",
+      "notes": [
+        "id 必须来自本人伙伴列表；未绑定、已解绑或停用的伙伴返回 PARTNER_NOT_FOUND。",
+        "只读取伙伴已有快照，不使用对方账号触发学校查询；尚无该学期快照时 data=null。"
+      ],
+      "related": [
+        "/teaching/companions",
+        "/teaching/companions/{id}/schedule"
+      ],
+      "parameters": {
+        "id": {
+          "description": "路径参数；使用前置列表返回的标识。",
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "example": "123"
+        },
+        "semester": {
+          "description": "伙伴课表学期；省略时使用伙伴保存的默认课表。",
+          "schema": {
+            "type": "string",
+            "pattern": "^\\d{4}-[123]$"
+          },
+          "example": "2026-1"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/CompanionTimetableResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": null
+      }
+    },
+    "/teaching/companions/{id}/schedule": {
+      "group": "伙伴课表",
+      "summary": "读取伙伴保存的自定义课程和日程。",
+      "notes": [
+        "沿用伙伴绑定校验；数据尚未保存时返回空数组。"
+      ],
+      "related": [
+        "/teaching/companions/{id}/timetable"
+      ],
+      "parameters": {
+        "id": {
+          "description": "路径参数；使用前置列表返回的标识。",
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "example": "123"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/ScheduleDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "plans": [],
+          "courses": [],
+          "clientUpdatedAt": null
+        }
+      }
+    },
+    "/utilities/electricity/details": {
+      "group": "寝室电费",
+      "summary": "读取绑定寝室的近 30 天用电明细。",
+      "notes": [
+        "寝室须先在小程序绑定；未绑定时 binding/account 为 null。",
+        "复用小程序历史补齐逻辑和同寝室共享缓存；完整历史已存在时直接返回，缺失时按需补齐。",
+        "日期范围以学校最新结算日往前 30 天为准；records 按日期倒序，不保证每天都有记录。"
+      ],
+      "related": [
+        "/utilities/electricity/account"
+      ],
+      "parameters": {},
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/ElectricityDataResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "binding": {
+            "buildingId": "100121",
+            "buildingName": "楠园1舍",
+            "roomNumber": "0305",
+            "boundAt": "2026-07-12T08:30:00.000Z",
+            "changedAt": "2026-08-17T11:20:00.000Z"
+          },
+          "account": {
+            "billedElectricityKwh": 174.49,
+            "electricityFeeYuan": 90.75,
+            "remainingAmountYuan": 18.52,
+            "availableElectricitySubsidyKwh": 119.29,
+            "lastPaymentDate": "2026-07-22",
+            "lastSettlementDate": "2026-08-14",
+            "dailyElectricityFees": [
+              {
+                "date": "2026-08-12",
+                "amountYuan": 2.1
+              },
+              {
+                "date": "2026-08-13",
+                "amountYuan": 1.95
+              },
+              {
+                "date": "2026-08-14",
+                "amountYuan": 2.7
+              }
+            ],
+            "electricityHistory": {
+              "version": 3,
+              "complete": true,
+              "sourceTimeZone": "Asia/Shanghai",
+              "fromDate": "2026-09-26",
+              "throughDate": "2026-10-25",
+              "fetchedAt": "2026-10-25T08:00:00Z",
+              "records": [
+                {
+                  "date": "2026-10-25",
+                  "billedElectricityKwh": 2,
+                  "remainingAmountYuan": 45,
+                  "dailySpendingYuan": 1.2,
+                  "totalElectricityKwh": 3
+                }
+              ]
+            }
+          },
+          "accountFetchedAt": "2026-08-17T11:20:00.000Z"
+        },
+        "meta": {
+          "cached": false,
+          "fetchedAt": "2026-08-17T11:20:00.000Z"
+        }
+      }
+    },
+    "/utilities/laundry/campuses": {
+      "group": "洗衣服务",
+      "summary": "获取洗衣服务校区。",
+      "notes": [
+        "校区、楼栋和点位标识使用接口结果，不要硬编码；目录缓存与小程序共享。"
+      ],
+      "related": [
+        "/utilities/laundry/buildings"
+      ],
+      "parameters": {},
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/LaundryCampusesResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "campuses": [
+            {
+              "id": "beibei",
+              "name": "Beibei"
+            }
+          ]
+        },
+        "meta": {
+          "cached": true,
+          "stale": false,
+          "fetchedAt": "2026-10-25T08:00:00Z"
+        }
+      }
+    },
+    "/utilities/laundry/buildings": {
+      "group": "洗衣服务",
+      "summary": "获取指定校区的洗衣宿舍楼。",
+      "notes": [
+        "校区、楼栋和点位标识使用接口结果，不要硬编码；目录缓存与小程序共享。"
+      ],
+      "related": [
+        "/utilities/laundry/positions",
+        "/utilities/laundry/account"
+      ],
+      "parameters": {
+        "campus": {
+          "description": "校区标识；从洗衣校区接口获取。",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "beibei",
+              "rongchang"
+            ],
+            "default": "beibei"
+          },
+          "example": "beibei"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/LaundryBuildingsResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "campus": "beibei",
+          "buildings": []
+        },
+        "meta": {
+          "cached": true,
+          "stale": false,
+          "fetchedAt": "2026-10-25T08:00:00Z"
+        }
+      }
+    },
+    "/utilities/laundry/positions": {
+      "group": "洗衣服务",
+      "summary": "按新旧宿舍名称检索洗衣点位。",
+      "notes": [
+        "校区、楼栋和点位标识使用接口结果，不要硬编码；目录缓存与小程序共享。"
+      ],
+      "related": [
+        "/utilities/laundry/devices"
+      ],
+      "parameters": {
+        "campus": {
+          "description": "校区标识；从洗衣校区接口获取。",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "beibei",
+              "rongchang"
+            ],
+            "default": "beibei"
+          },
+          "example": "beibei"
+        },
+        "name": {
+          "description": "宿舍名称；省略时列出全部点位。",
+          "schema": {
+            "type": "string",
+            "maxLength": 160
+          }
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/LaundryPositionsResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "campus": "beibei",
+          "positions": []
+        },
+        "meta": {
+          "cached": true,
+          "stale": false,
+          "fetchedAt": "2026-10-25T08:00:00Z"
+        }
+      }
+    },
+    "/utilities/laundry/account": {
+      "group": "洗衣服务",
+      "summary": "读取本人保存的洗衣寝室绑定。",
+      "notes": [
+        "绑定或修改寝室请在小程序完成；未绑定时 binding=null。"
+      ],
+      "related": [
+        "/utilities/laundry/buildings",
+        "/utilities/laundry/devices"
+      ],
+      "parameters": {},
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/LaundryAccountResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "binding": null,
+          "electricitySuggestion": null,
+          "serverNow": "2026-10-25T08:00:00Z"
+        },
+        "meta": {
+          "cached": true,
+          "stale": false,
+          "fetchedAt": "2026-10-25T08:00:00Z"
+        }
+      }
+    },
+    "/utilities/laundry/devices": {
+      "group": "洗衣服务",
+      "summary": "查询洗衣机与烘干机状态。",
+      "notes": [
+        "positionId 与 name 必须二选一；设备剩余时间结合 serverNow 和 expectedFinishAt 使用。",
+        "复用小程序的按需刷新、共享缓存和请求合并；stale=true 时保留更新时间，不将旧状态当作实时状态。"
+      ],
+      "related": [
+        "/utilities/laundry/positions",
+        "/utilities/laundry/account"
+      ],
+      "parameters": {
+        "campus": {
+          "description": "校区标识；从洗衣校区接口获取。",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "beibei",
+              "rongchang"
+            ],
+            "default": "beibei"
+          },
+          "example": "beibei"
+        },
+        "positionId": {
+          "description": "点位标识；与 name 必须且只能填写一个。",
+          "schema": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]{0,15}$"
+          },
+          "example": "123"
+        },
+        "name": {
+          "description": "宿舍名称；与 positionId 二选一。",
+          "schema": {
+            "type": "string",
+            "maxLength": 160
+          }
+        },
+        "type": {
+          "description": "设备类型。",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "all",
+              "washer",
+              "dryer"
+            ],
+            "default": "all"
+          },
+          "example": "all"
+        },
+        "refresh": {
+          "description": "沿用小程序刷新逻辑，默认更新；共享缓存和合并请求仍然生效。",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          },
+          "example": true
+        },
+        "preview": {
+          "description": "优先返回已有预览，必要时后台更新。",
+          "schema": {
+            "type": "boolean",
+            "default": false
+          },
+          "example": false
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/LaundryDevicesResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "campus": "beibei",
+          "query": null,
+          "positions": [],
+          "sourceTimeZone": "Asia/Shanghai",
+          "serverNow": "2026-10-25T08:00:00Z",
+          "refreshing": false,
+          "devices": [],
+          "counts": {
+            "washer": 0,
+            "dryer": 0,
+            "idle": 0,
+            "occupied": 0,
+            "fault": 0,
+            "unknown": 0
+          }
+        },
+        "meta": {
+          "cached": true,
+          "stale": false,
+          "fetchedAt": "2026-10-25T08:00:00Z"
+        }
+      }
+    },
+    "/campus-documents/certificates": {
+      "group": "校园证明",
+      "summary": "获取可开具证明和本人任务、文件。",
+      "notes": [
+        "证明目录和开具选项复用小程序服务；只能开具本人当前身份允许的证明。"
+      ],
+      "related": [
+        "/campus-documents/certificates/{id}/options",
+        "/campus-documents/certificates/{id}/issue"
+      ],
+      "parameters": {
+        "refresh": {
+          "description": "是否重新同步共享目录；正常读取复用现有目录。",
+          "schema": {
+            "type": "boolean",
+            "default": false
+          },
+          "example": false
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/CertificateCatalogResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "scopeKey": "example",
+          "items": [],
+          "updatedAt": "2026-10-25T08:00:00Z",
+          "files": [],
+          "jobs": [],
+          "checkedAt": "2026-10-25T08:00:00Z"
+        }
+      }
+    },
+    "/campus-documents/certificates/state": {
+      "group": "校园证明",
+      "summary": "查询本人证明开具进度和有效文件。",
+      "notes": [
+        "提交后每隔至少 2 秒轮询；按 jobId 匹配 jobs[].id，running=false 后检查 error 和 files。",
+        "开具任务最多运行 5 分钟；过期或失败后根据错误信息决定是否重新提交。"
+      ],
+      "related": [
+        "/campus-documents/certificates/{id}/issue",
+        "/campus-documents/files/{id}"
+      ],
+      "parameters": {},
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/CertificateStateResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "files": [],
+          "jobs": [],
+          "checkedAt": "2026-10-25T08:00:00Z",
+          "catalogVersion": {
+            "scopeKey": "example",
+            "updatedAt": "2026-10-25T08:00:00Z"
+          }
+        }
+      }
+    },
+    "/campus-documents/certificates/{id}/options": {
+      "group": "校园证明",
+      "summary": "读取指定证明可用的填写选项。",
+      "notes": [
+        "选项来自本人证明目录；selected 的键取 options[].id，值取对应 content[].value。"
+      ],
+      "related": [
+        "/campus-documents/certificates/{id}/issue"
+      ],
+      "parameters": {
+        "id": {
+          "description": "路径参数；使用前置列表返回的标识。",
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "example": "certificate-id"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/CertificateOptionsResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": []
+      }
+    },
+    "/campus-documents/certificates/{id}/issue": {
+      "group": "校园证明",
+      "summary": "提交本人证明开具任务。",
+      "notes": [
+        "此接口执行开具操作，需要独立的 documents:issue 权限；已有应用须显式增加该权限。",
+        "发送 JSON 请求体；无选项时发送 {}。HTTP 202 仅代表任务已接收，完成后到状态接口读取文件。",
+        "同一用户、同一证明已有运行任务时复用任务；任务完成后再次提交会重新开具，不要对成功请求自动重试。"
+      ],
+      "related": [
+        "/campus-documents/certificates/state",
+        "/campus-documents/files/{id}"
+      ],
+      "parameters": {
+        "id": {
+          "description": "路径参数；使用前置列表返回的标识。",
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "example": "certificate-id"
+        }
+      },
+      "content_type": "application/json",
+      "response_schema": {
+        "$ref": "#/components/schemas/CertificateIssueResponse"
+      },
+      "response_example": {
+        "success": true,
+        "data": {
+          "jobId": "11111111-2222-4333-8444-555555555555"
+        }
+      },
+      "request_schema": {
+        "$ref": "#/components/schemas/CertificateIssueRequest"
+      },
+      "request_example": {
+        "selected": {}
+      },
+      "success_status": 202
+    },
+    "/campus-documents/files/{id}": {
+      "group": "校园证明",
+      "summary": "下载本人已发布且未过期的证明 PDF。",
+      "notes": [
+        "id 使用 files[].id；仅限本人文件，文件默认保留 24 小时，重新开具会使同类旧文件失效。",
+        "成功返回 application/pdf 原始字节，最大 20 MiB；错误仍为 JSON，下载需要 documents:read。"
+      ],
+      "related": [
+        "/campus-documents/certificates/state"
+      ],
+      "parameters": {
+        "id": {
+          "description": "路径参数；使用前置列表返回的标识。",
+          "schema": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "example": "11111111-2222-4333-8444-555555555555"
+        }
+      },
+      "content_type": "application/pdf",
+      "response_schema": {
+        "type": "string",
+        "format": "binary"
+      },
+      "response_example": null
     }
   }
 }

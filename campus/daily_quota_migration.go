@@ -22,7 +22,7 @@ func migrateDailyQuota1000(tx *gorm.DB) error {
 		return err
 	}
 	if policy.DailyQuota == 2000 {
-		policy.DailyQuota = DefaultDailyQuota
+		policy.DailyQuota = 1000
 		raw, err := common.Marshal(policy)
 		if err != nil {
 			return err
@@ -37,5 +37,5 @@ func migrateDailyQuota1000(tx *gorm.DB) error {
 			return err
 		}
 	}
-	return tx.Model(&EndpointPolicy{}).Where("daily_quota = ?", 2000).Update("daily_quota", DefaultDailyQuota).Error
+	return tx.Model(&EndpointPolicy{}).Where("daily_quota = ?", 2000).Update("daily_quota", 1000).Error
 }

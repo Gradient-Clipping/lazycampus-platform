@@ -45,7 +45,7 @@ func TestDefaultLimitMigrationPreservesCustomSettingsAndLegacyNotice(t *testing.
 	assert.True(t, when.Equal(notices[0].CreatedAt))
 	identity, err := AuthorizedIdentity(Claims{Subject: "school", IdentityID: "11111111-2222-4333-8444-555555555555", StudentNumber: "test"})
 	require.NoError(t, err)
-	assert.Equal(t, int64(20), identity.RateLimit)
+	assert.Equal(t, int64(DefaultRateLimit), identity.RateLimit)
 }
 
 func TestAnnouncementPublishingPermissionsHistoryAndWithdrawal(t *testing.T) {

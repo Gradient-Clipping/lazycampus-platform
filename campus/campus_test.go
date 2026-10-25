@@ -43,8 +43,8 @@ func TestSchoolAndAdministratorAllowlist(t *testing.T) {
 			if tc.allowed {
 				require.NoError(t, err)
 				assert.Equal(t, tc.role, u.Role)
-				assert.EqualValues(t, 1000, u.DailyQuota)
-				assert.EqualValues(t, 20, u.RateLimit)
+				assert.EqualValues(t, 1500, u.DailyQuota)
+				assert.EqualValues(t, 30, u.RateLimit)
 			} else {
 				assert.Error(t, err)
 			}

@@ -1,6 +1,6 @@
 import { translate } from '@/i18n/translate'
 
-import type { ReferenceSchema } from './types'
+import type { Endpoint, ReferenceSchema } from './types'
 
 export const apiOrigin = 'https://platform.lazycampus.com'
 export type ExampleLanguage = 'bash' | 'javascript' | 'python'
@@ -8,18 +8,21 @@ export type ExampleLanguage = 'bash' | 'javascript' | 'python'
 export function requestExample(
   path: string,
   binary: boolean,
-  language: ExampleLanguage
+  language: ExampleLanguage,
+  method = 'GET',
+  body = '{}'
 ) {
   const url = `${apiOrigin}${path}`
   if (language === 'bash') {
-    return `curl --fail-with-body --silent --show-error --max-time 90 '${url}' \\\n  -H "Authorization: Bearer $LAZYCAMPUS_API_KEY"${binary ? ' \\\n  --output response.bin' : ''}`
+    const payload = body.replaceAll("'", "'\"'\"'")
+    return `curl --fail-with-body --silent --show-error --max-time 90 '${url}' \\\n  -H "Authorization: Bearer $LAZYCAMPUS_API_KEY"${method === 'POST' ? ` \\\n  -X POST -H 'Content-Type: application/json' \\\n  --data-raw '${payload}'` : ''}${binary ? ' \\\n  --output response.bin' : ''}`
   }
   if (language === 'javascript') {
     return `${binary ? "import { writeFile } from 'node:fs/promises'\n\n" : ''}const apiKey = process.env.LAZYCAMPUS_API_KEY
 if (!apiKey) throw new Error(${JSON.stringify(translate('请设置 LAZYCAMPUS_API_KEY'))})
 
 const response = await fetch(${JSON.stringify(url)}, {
-  headers: { Authorization: \`Bearer \${apiKey}\` },
+  ${method === 'POST' ? `method: 'POST',\n  body: ${JSON.stringify(body)},\n  ` : ''}headers: { Authorization: \`Bearer \${apiKey}\`${method === 'POST' ? ", 'Content-Type': 'application/json'" : ''} },
   signal: AbortSignal.timeout(90000),
 })
 const requestId = response.headers.get('X-Request-Id')
@@ -39,7 +42,8 @@ from urllib.error import HTTPError
 api_key = os.environ['LAZYCAMPUS_API_KEY']
 request = Request(
     ${JSON.stringify(url)},
-    headers={'Authorization': f'Bearer {api_key}'},
+    headers={'Authorization': f'Bearer {api_key}'${method === 'POST' ? ", 'Content-Type': 'application/json'" : ''}},
+${method === 'POST' ? `    method='POST', data=${JSON.stringify(body)}.encode('utf-8'),\n` : ''}\
 )
 try:
     with urlopen(request, timeout=90) as response:
@@ -51,6 +55,34 @@ except HTTPError as error:
     print(${JSON.stringify(translate('重试等待秒数:'))}, error.headers.get('Retry-After'))
     print(error.read().decode('utf-8'))
     raise`
+}
+
+export function endpointPath(
+  endpoint: Endpoint,
+  values: Record<string, string>,
+  examples = false
+) {
+  let path = endpoint.path
+  const query = new URLSearchParams()
+  for (const parameter of endpoint.parameters) {
+    const value =
+      values[parameter.name] ||
+      (examples && parameter.required
+        ? String(
+            endpoint.documentation?.parameters[parameter.name]?.example ??
+              parameter.example ??
+              ''
+          )
+        : '')
+    if (path.includes(`{${parameter.name}}`)) {
+      if (value) {
+        path = path.replace(`{${parameter.name}}`, encodeURIComponent(value))
+      }
+    } else if (value) {
+      query.set(parameter.name, value)
+    }
+  }
+  return `/v1${path}${query.size ? `?${query}` : ''}`
 }
 
 export const referenceGuides = [

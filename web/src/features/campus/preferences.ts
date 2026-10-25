@@ -17,11 +17,6 @@ export const sidebarOptions = [
     detail: 'Keys, permissions and quotas',
   },
   {
-    path: '/api-reference',
-    title: 'API reference',
-    detail: 'Explore campus APIs',
-  },
-  {
     path: '/logs',
     title: 'Request logs',
     detail: 'View your application requests',

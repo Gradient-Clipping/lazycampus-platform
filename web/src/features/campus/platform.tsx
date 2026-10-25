@@ -59,7 +59,6 @@ const navigation = [
   { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { to: '/analytics', label: 'Usage analytics', icon: BarChart3 },
   { to: '/apps', label: 'Applications', icon: Box },
-  { to: '/api-reference', label: 'API reference', icon: BookOpen },
   { to: '/logs', label: 'Request logs', icon: Activity },
 ] as const
 const administration = [
@@ -253,6 +252,7 @@ function PlatformLayout(props: {
   )
   const [scrolled, setScrolled] = useState(false)
   const isHome = props.pathname === '/' || props.pathname === '/status'
+  const isReference = props.pathname === '/api-reference'
   const site = useSite()
   const isAdmin = props.user?.role === 'admin'
   useEffect(() => {
@@ -267,7 +267,7 @@ function PlatformLayout(props: {
   }, [isHome])
   return (
     <div
-      className={`${isHome ? 'home-shell' : 'platform-shell'} ${collapsed ? 'sidebar-collapsed' : ''}`}
+      className={`${isHome ? 'home-shell' : 'platform-shell'} ${isReference ? 'reference-shell' : ''} ${collapsed ? 'sidebar-collapsed' : ''}`}
     >
       <a
         className='skip-content'
@@ -288,7 +288,7 @@ function PlatformLayout(props: {
         className={`site-header ${isHome && scrolled ? 'is-scrolled' : ''}`}
       >
         <div className='site-header-left'>
-          {!isHome && (
+          {!isHome && !isReference && (
             <Button
               variant='ghost'
               size='icon'
@@ -301,7 +301,7 @@ function PlatformLayout(props: {
               <PanelLeftClose size={18} />
             </Button>
           )}
-          {!isHome && (
+          {!isHome && !isReference && (
             <Button
               variant='ghost'
               size='icon'
@@ -326,10 +326,15 @@ function PlatformLayout(props: {
             <Link to='/' className={isHome ? 'selected' : ''}>
               {t('Home')}
             </Link>
-            <Link to='/dashboard' className={!isHome ? 'selected' : ''}>
+            <Link
+              to='/dashboard'
+              className={!isHome && !isReference ? 'selected' : ''}
+            >
               {t('Console')}
             </Link>
-            <Link to='/api-reference'>{t('API reference')}</Link>
+            <Link to='/api-reference' className={isReference ? 'selected' : ''}>
+              {t('API reference')}
+            </Link>
           </nav>
           <AnnouncementBell key={props.user?.id || 0} userId={props.user?.id} />
           {props.user && <PersonalBell />}
@@ -395,7 +400,7 @@ function PlatformLayout(props: {
         props.children
       ) : (
         <>
-          {menu && (
+          {menu && !isReference && (
             <button
               type='button'
               className='sidebar-scrim'
@@ -403,84 +408,24 @@ function PlatformLayout(props: {
               onClick={() => setMenu(false)}
             />
           )}
-          <aside
-            id='platform-sidebar'
-            className={`platform-sidebar ${menu ? 'is-open' : ''}`}
-            onKeyDown={(event) => {
-              if (event.key === 'Escape') {
-                setMenu(false)
-                document
-                  .querySelector<HTMLButtonElement>('.mobile-menu')
-                  ?.focus()
-              }
-            }}
-          >
-            <div className='nav-caption'>{t('General')}</div>
-            <nav aria-label={t('Workspace')}>
-              {navigation
-                .filter((item) => preferences.sidebar[item.to] !== false)
-                .map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    title={t(item.label)}
-                    aria-label={t(item.label)}
-                    onClick={() => setMenu(false)}
-                    className={
-                      props.pathname === item.to
-                        ? 'nav-item active'
-                        : 'nav-item'
-                    }
-                  >
-                    <item.icon size={17} />
-                    <span className='nav-label'>{t(item.label)}</span>
-                  </Link>
-                ))}
-            </nav>
-            <div className='nav-caption'>{t('Personal')}</div>
-            <nav aria-label={t('Personal')}>
-              {[
-                {
-                  to: '/notifications',
-                  label: 'Notifications',
-                  icon: Activity,
-                },
-                { to: '/sessions', label: 'Login devices', icon: Monitor },
-              ].map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  title={t(item.label)}
-                  aria-label={t(item.label)}
-                  onClick={() => setMenu(false)}
-                  className={
-                    props.pathname === item.to ? 'nav-item active' : 'nav-item'
-                  }
-                >
-                  <item.icon size={17} />
-                  <span className='nav-label'>{t(item.label)}</span>
-                </Link>
-              ))}
-              <Link
-                to='/profile'
-                title={t('Profile')}
-                aria-label={t('Profile')}
-                onClick={() => setMenu(false)}
-                className={
-                  ['/profile', '/account'].includes(props.pathname)
-                    ? 'nav-item active'
-                    : 'nav-item'
+          {!isReference && (
+            <aside
+              id='platform-sidebar'
+              className={`platform-sidebar ${menu ? 'is-open' : ''}`}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  setMenu(false)
+                  document
+                    .querySelector<HTMLButtonElement>('.mobile-menu')
+                    ?.focus()
                 }
-              >
-                <UserRound size={17} />
-                <span className='nav-label'>{t('Profile')}</span>
-              </Link>
-            </nav>
-            {isAdmin && (
-              <>
-                <div className='nav-caption'>{t('Administration')}</div>
-                <nav aria-label={t('Administration')}>
-                  {administration.map((item) => (
+              }}
+            >
+              <div className='nav-caption'>{t('General')}</div>
+              <nav aria-label={t('Workspace')}>
+                {navigation
+                  .filter((item) => preferences.sidebar[item.to] !== false)
+                  .map((item) => (
                     <Link
                       key={item.to}
                       to={item.to}
@@ -497,24 +442,88 @@ function PlatformLayout(props: {
                       <span className='nav-label'>{t(item.label)}</span>
                     </Link>
                   ))}
-                </nav>
-              </>
-            )}
-            <div className='sidebar-bottom'>
-              <div className='free-status'>
-                <span />
-                {t('Free access')}
+              </nav>
+              <div className='nav-caption'>{t('Personal')}</div>
+              <nav aria-label={t('Personal')}>
+                {[
+                  {
+                    to: '/notifications',
+                    label: 'Notifications',
+                    icon: Activity,
+                  },
+                  { to: '/sessions', label: 'Login devices', icon: Monitor },
+                ].map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    title={t(item.label)}
+                    aria-label={t(item.label)}
+                    onClick={() => setMenu(false)}
+                    className={
+                      props.pathname === item.to
+                        ? 'nav-item active'
+                        : 'nav-item'
+                    }
+                  >
+                    <item.icon size={17} />
+                    <span className='nav-label'>{t(item.label)}</span>
+                  </Link>
+                ))}
+                <Link
+                  to='/profile'
+                  title={t('Profile')}
+                  aria-label={t('Profile')}
+                  onClick={() => setMenu(false)}
+                  className={
+                    ['/profile', '/account'].includes(props.pathname)
+                      ? 'nav-item active'
+                      : 'nav-item'
+                  }
+                >
+                  <UserRound size={17} />
+                  <span className='nav-label'>{t('Profile')}</span>
+                </Link>
+              </nav>
+              {isAdmin && (
+                <>
+                  <div className='nav-caption'>{t('Administration')}</div>
+                  <nav aria-label={t('Administration')}>
+                    {administration.map((item) => (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        title={t(item.label)}
+                        aria-label={t(item.label)}
+                        onClick={() => setMenu(false)}
+                        className={
+                          props.pathname === item.to
+                            ? 'nav-item active'
+                            : 'nav-item'
+                        }
+                      >
+                        <item.icon size={17} />
+                        <span className='nav-label'>{t(item.label)}</span>
+                      </Link>
+                    ))}
+                  </nav>
+                </>
+              )}
+              <div className='sidebar-bottom'>
+                <div className='free-status'>
+                  <span />
+                  {t('Free access')}
+                </div>
+                <a
+                  href='https://github.com/Gradient-Clipping/lazycampus-platform'
+                  target='_blank'
+                  rel='noreferrer'
+                >
+                  {t('View source')}
+                  <ArrowUpRight size={14} />
+                </a>
               </div>
-              <a
-                href='https://github.com/Gradient-Clipping/lazycampus-platform'
-                target='_blank'
-                rel='noreferrer'
-              >
-                {t('View source')}
-                <ArrowUpRight size={14} />
-              </a>
-            </div>
-          </aside>
+            </aside>
+          )}
           <div className='platform-body'>
             <main className='platform-main' id='content' tabIndex={-1}>
               {props.children}
