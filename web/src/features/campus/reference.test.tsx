@@ -263,16 +263,20 @@ it('downloads a verified JSON contract beside the document title and rejects HTM
   expect(create).toHaveBeenCalledTimes(1)
 })
 
-it('places MCP last in the guides and explains scoped tools and write consent', async () => {
+it('places MCP last in the guides and provides a usable connection example', async () => {
   view('mcp')
   expect(await screen.findByRole('heading', { name: 'MCP 接入' })).toBeVisible()
   const guides = document.querySelectorAll('.reference-guide-item')
   expect([...guides].at(-1)?.textContent).toContain('MCP 接入')
-  expect(screen.getByText('https://platform.lazycampus.com/mcp')).toBeVisible()
-  expect(screen.getByText(/开具证明需 documents:issue 权限/)).toHaveTextContent(
-    'confirm: true'
+  const example = JSON.parse(
+    document.querySelector('.api-document pre')?.textContent || ''
   )
-  expect(screen.getByText(/MCP 提供 24 项结构化数据工具/)).toBeVisible()
+  expect(example.mcpServers.lazycampus).toEqual({
+    url: 'https://platform.lazycampus.com/mcp',
+    headers: { Authorization: 'Bearer APPLICATION_KEY' },
+  })
+  expect(screen.getByText('查询宿舍电费余额和洗衣机状态。')).toBeVisible()
+  expect(screen.getByText(/可用工具由应用权限决定/)).toBeVisible()
 })
 
 function view(hash = 'start') {
