@@ -1879,6 +1879,7 @@
                     },
                     "teachingMethod": {
                       "type": "string",
+                      "nullable": true,
                       "description": "教学方式"
                     },
                     "selectionStatus": {
@@ -3025,6 +3026,7 @@
                         },
                         "teachingMethod": {
                           "type": "string",
+                          "nullable": true,
                           "description": "教学方式"
                         },
                         "selectionStatus": {
@@ -3251,7 +3253,7 @@
           "description": "设备状态文字"
         },
         "floor": {
-          "type": "string",
+          "type": "integer",
           "nullable": true
         },
         "number": {

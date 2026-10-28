@@ -76,6 +76,44 @@ func connectMCP(t *testing.T, a *App, key string) *mcp.ClientSession {
 	return session
 }
 
+func TestMCPRealTimetableAndLaundryOutputTypes(t *testing.T) {
+	for _, tc := range []struct {
+		name, path, scope, payload string
+		args                       map[string]any
+	}{
+		{"get_my_timetable", "/teaching/timetable", "timetable:read", `{"success":true,"data":{"courses":[{"id":"course","arrangements":[{"teachingMethod":null},{"teachingMethod":"In person"}]}]}}`, map[string]any{}},
+		{"get_bound_companion_timetable", "/teaching/companions/123/timetable", "companions:read", `{"success":true,"data":{"courses":[{"id":"course","arrangements":[{"teachingMethod":null},{"teachingMethod":"In person"}]}]}}`, map[string]any{"id": "123"}},
+		{"get_bound_dorm_laundry", "/utilities/laundry/devices", "laundry:read", `{"success":true,"data":{"binding":null,"devices":[{"id":"washer-1","floor":3},{"id":"washer-2","floor":null},{"id":"dryer-1","floor":-1}]}}`, map[string]any{}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			a, user, _ := testApp(t)
+			token, key := testKey(t, a, user)
+			require.NoError(t, a.DB.Model(&token).Update("scopes", tc.scope).Error)
+			upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "/internal/platform/v1"+tc.path, r.URL.Path)
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprint(w, tc.payload)
+			}))
+			defer upstream.Close()
+			a.Config.CampusURL = upstream.URL
+			result, err := connectMCP(t, a, key).CallTool(context.Background(), &mcp.CallToolParams{Name: tc.name, Arguments: tc.args})
+			require.NoError(t, err, "valid campus data must pass the SDK's output schema validation")
+			require.False(t, result.IsError)
+			raw, err := json.Marshal(result.StructuredContent)
+			require.NoError(t, err)
+			var output struct {
+				HTTPStatus int             `json:"httpStatus"`
+				RequestID  string          `json:"requestId"`
+				Response   json.RawMessage `json:"response"`
+			}
+			require.NoError(t, json.Unmarshal(raw, &output))
+			assert.Equal(t, 200, output.HTTPStatus)
+			assert.NotEmpty(t, output.RequestID)
+			assert.JSONEq(t, tc.payload, string(output.Response), "preserve nulls and numeric floors without coercion")
+		})
+	}
+}
+
 func TestMCPToolsUseCurrentPermissionsAndSharedGateway(t *testing.T) {
 	a, user, _ := testApp(t)
 	token, key := testKey(t, a, user)

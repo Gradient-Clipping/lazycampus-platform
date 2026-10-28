@@ -114,6 +114,22 @@ func TestGraphQLSharedQuotaFieldSelectionAndPartialErrors(t *testing.T) {
 	assert.Equal(t, 401, graphqlCall(a, key, `{ apiGuide }`, nil).Code)
 }
 
+func TestGraphQLLaundryPreservesNumericAndNullFloors(t *testing.T) {
+	a, user, _ := testApp(t)
+	token, key := testKey(t, a, user)
+	require.NoError(t, a.DB.Model(&token).Update("scopes", "laundry:read").Error)
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/internal/platform/v1/utilities/laundry/devices", r.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"success":true,"data":{"devices":[{"floor":3},{"floor":null},{"floor":-1}]}}`)
+	}))
+	defer upstream.Close()
+	a.Config.CampusURL = upstream.URL
+	response := graphqlCall(a, key, `{ getBoundDormLaundry { success data { devices { floor } } } }`, nil)
+	require.Equal(t, 200, response.Code)
+	assert.JSONEq(t, `{"data":{"getBoundDormLaundry":{"success":true,"data":{"devices":[{"floor":3},{"floor":null},{"floor":-1}]}}}}`, response.Body.String())
+}
+
 func TestGraphQLVariablesMutationConsentAndLivePolicy(t *testing.T) {
 	a, user, _ := testApp(t)
 	token, key := testKey(t, a, user)
